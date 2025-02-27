@@ -23,6 +23,7 @@
             box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
             width: 300px;
             text-align: center;
+            position: relative;
         }
         h1 {
             font-size: 2em;
@@ -55,10 +56,26 @@
             color: #fff;
             cursor: pointer;
         }
+        .back-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .back-button:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <button class="back-button" onclick="window.location.href='chat.html'">Back to Chat</button>
         <h1 id="formTitle">Login</h1>
         <form id="loginForm">
             <input type="text" id="loginUsername" placeholder="Username" required>
@@ -87,17 +104,17 @@
         toggleSignup.addEventListener('click', () => {
             loginForm.style.display = 'none';
             signupForm.style.display = 'block';
-            signupToggle.style.display = 'none';
+            signupToggle.style.display = 'none'; // Hide the "Don't have an account?" link
             toggleLogin.style.display = 'block';
-            formTitle.style.display = 'none';
+            formTitle.style.display = 'none'; // Hide the login title
         });
 
         toggleLogin.addEventListener('click', () => {
             signupForm.style.display = 'none';
             loginForm.style.display = 'block';
             toggleLogin.style.display = 'none';
-            signupToggle.style.display = 'block';
-            formTitle.style.display = 'block';
+            signupToggle.style.display = 'block'; // Show the "Don't have an account?" link
+            formTitle.style.display = 'block'; // Show the login title
         });
 
         loginForm.addEventListener('submit', (event) => {
