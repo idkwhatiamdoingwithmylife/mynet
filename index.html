@@ -130,8 +130,13 @@
             event.preventDefault();
             const nameInput = document.getElementById('nameInput');
             const itemInput = document.getElementById('itemInput');
-            const name = nameInput.value.trim() || 'Anonymous';
+            const name = nameInput.value.trim();
             const item = itemInput.value.trim();
+
+            if (!name || !item) {
+                alert('Username and message cannot be blank or just spaces.');
+                return;
+            }
 
             const message = `${name}: ${item}`;
 
