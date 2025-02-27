@@ -4,21 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connection Status</title>
-    <script>
-        async function fetchIP() {
-            try {
-                const response = await fetch('/api/api.js');
-                const data = await response.json();
-                document.getElementById('status').innerText = `Connected to: ${data.ip}`;
-            } catch (error) {
-                console.error('Error fetching IP:', error);
-            }
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
         }
-
-        window.onload = fetchIP;
-    </script>
+        #status {
+            font-size: 24px;
+            color: green;
+        }
+    </style>
 </head>
 <body>
-    <h1 id="status">Connecting...</h1>
+    <h1>Connection Status</h1>
+    <div id="status"></div>
+
+    <script>
+        async function fetchConnectionStatus() {
+            const response = await fetch('/api');
+            const data = await response.json();
+            document.getElementById('status').innerText = data.message;
+        }
+
+        fetchConnectionStatus();
+    </script>
 </body>
 </html>
