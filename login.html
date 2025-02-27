@@ -65,7 +65,7 @@
             <input type="password" id="loginPassword" placeholder="Password" required>
             <button type="submit">Login</button>
         </form>
-        <div class="toggle">Don't have an account? <span id="toggleSignup" style="color: #4CAF50;">Sign Up</span></div>
+        <div class="toggle" id="signupToggle">Don't have an account? <span id="toggleSignup" style="color: #4CAF50;">Sign Up</span></div>
 
         <form id="signupForm" style="display:none;">
             <h1 id="signupTitle">Sign Up</h1>
@@ -81,22 +81,23 @@
         const signupForm = document.getElementById('signupForm');
         const toggleSignup = document.getElementById('toggleSignup');
         const toggleLogin = document.getElementById('toggleLogin');
+        const signupToggle = document.getElementById('signupToggle');
         const formTitle = document.getElementById('formTitle');
 
         toggleSignup.addEventListener('click', () => {
             loginForm.style.display = 'none';
             signupForm.style.display = 'block';
-            toggleSignup.style.display = 'none';
+            signupToggle.style.display = 'none';
             toggleLogin.style.display = 'block';
-            formTitle.style.display = 'none'; // Hide the login title
+            formTitle.style.display = 'none';
         });
 
         toggleLogin.addEventListener('click', () => {
             signupForm.style.display = 'none';
             loginForm.style.display = 'block';
             toggleLogin.style.display = 'none';
-            toggleSignup.style.display = 'block';
-            formTitle.style.display = 'block'; // Show the login title
+            signupToggle.style.display = 'block';
+            formTitle.style.display = 'block';
         });
 
         loginForm.addEventListener('submit', (event) => {
