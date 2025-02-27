@@ -18,11 +18,12 @@
         form {
             margin-bottom: 20px;
         }
-        input[type="text"] {
+        input[type="text"], input[type="text"].name-input {
             padding: 10px;
             width: calc(100% - 110px);
             border: 1px solid #ccc;
             border-radius: 4px;
+            margin-bottom: 10px;
         }
         button {
             padding: 10px;
@@ -55,7 +56,8 @@
 <body>
     <h1>Anonymous Live Chat</h1>
     <form id="itemForm">
-        <input type="text" id="itemInput" placeholder="Enter your message (max 1000 characters)" required maxlength="1000>
+        <input type="text" class="name-input" id="nameInput" placeholder="Enter your display name" required>
+        <input type="text" id="itemInput" placeholder="Enter your message (max 1000 characters)" required maxlength="1000">
         <button type="submit">Send</button>
     </form>
     <h2>Messages:</h2>
@@ -82,13 +84,17 @@
 
         itemForm.addEventListener('submit', async function(event) {
             event.preventDefault();
+            const nameInput = document.getElementById('nameInput');
             const itemInput = document.getElementById('itemInput');
+            const name = nameInput.value.trim() || 'Anonymous';
             const item = itemInput.value.trim();
+
+            const message = `${name}: ${item}`;
 
             const response = await fetch('/.netlify/functions/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ item })
+                body: JSON.stringify({ item: message })
             });
 
             const data = await response.json();
@@ -96,7 +102,7 @@
                 itemInput.value = '';
                 fetchItems();
             } else {
-                alert('Message already exists or is invalid.');
+                alert('Message is invalid.');
             }
         });
 
