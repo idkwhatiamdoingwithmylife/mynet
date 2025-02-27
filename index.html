@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #e9ecef;
             margin: 0;
             padding: 0;
         }
@@ -22,6 +22,7 @@
         }
         h1 {
             text-align: center;
+            color: #343a40;
         }
         .chat-box {
             border: 1px solid #ddd;
@@ -29,11 +30,15 @@
             overflow-y: scroll;
             padding: 10px;
             margin-bottom: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
         }
         .chat-input {
             width: calc(100% - 50px);
             padding: 10px;
             margin-right: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
         }
         .btn {
             padding: 10px 20px;
@@ -41,13 +46,23 @@
             border: none;
             color: white;
             cursor: pointer;
-            border-radius: 4px;
+            border-radius: 5px;
         }
         .btn:hover {
             background-color: #0056b3;
         }
         .hidden {
             display: none;
+        }
+        .auth-container {
+            text-align: center;
+        }
+        .auth-container a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .auth-container a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -60,7 +75,7 @@
         <input type="text" id="chatInput" class="chat-input" placeholder="Type a message...">
         <button id="sendButton" class="btn">Send</button>
     </div>
-    <div id="authContainer">
+    <div id="authContainer" class="auth-container">
         <input type="text" id="username" placeholder="Enter username">
         <button id="loginButton" class="btn">Login</button>
         <button id="logoutButton" class="btn hidden">Logout</button>
@@ -79,7 +94,7 @@
     const usernameInput = document.getElementById('username');
 
     let username = localStorage.getItem('username');
-    
+
     if (username) {
         login(username);
     }
@@ -89,7 +104,7 @@
         const password = prompt("Enter your password:");
 
         if (user && password) {
-            const response = await fetch('/.netlify/functions/users/login', {
+            const response = await fetch('/.netlify/functions/users', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: user, password })
