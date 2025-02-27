@@ -30,19 +30,13 @@
             }
         }
 
-        async function checkConnection() {
-            const response = await fetch("https://funny-marigold-5eed7d.netlify.app/status");
+        function updateStatus(connected) {
             const statusDiv = document.getElementById("status");
-            if (response.ok) {
-                const data = await response.json();
-                statusDiv.innerText = data.connected ? "Computer is connected." : "Computer is not connected.";
-            } else {
-                statusDiv.innerText = "Failed to check connection.";
-            }
+            statusDiv.innerText = connected ? "Computer is connected." : "Computer is not connected.";
         }
 
-        // Check connection on page load
-        window.onload = checkConnection;
+        // Check connection status on page load
+        window.onload = () => updateStatus(true);
     </script>
 </body>
 </html>
