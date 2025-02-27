@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #e9ecef;
             margin: 0;
             padding: 0;
         }
@@ -22,11 +22,14 @@
         }
         h1 {
             text-align: center;
+            color: #343a40;
         }
         input {
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
         }
         .btn {
             padding: 10px;
@@ -34,11 +37,21 @@
             border: none;
             color: white;
             cursor: pointer;
-            border-radius: 4px;
+            border-radius: 5px;
             width: 100%;
         }
         .btn:hover {
             background-color: #0056b3;
+        }
+        .auth-container {
+            text-align: center;
+        }
+        .auth-container a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .auth-container a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -68,7 +81,8 @@
                 alert('Account created successfully! You can now log in.');
                 window.location.href = 'index.html';
             } else {
-                alert('Error creating account. Please try again.');
+                const errorData = await response.json();
+                alert(errorData.message);
             }
         } else {
             alert('Please fill in all fields.');
