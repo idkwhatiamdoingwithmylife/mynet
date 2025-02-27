@@ -3,7 +3,7 @@ let items = [];
 exports.handler = async (event) => {
     if (event.httpMethod === 'POST') {
         const { item } = JSON.parse(event.body);
-        if (item && !items.includes(item)) {
+        if (item && !items.includes(item) && item.length <= 1000) {
             items.push(item);
             return {
                 statusCode: 200,
