@@ -1,14 +1,13 @@
-let items = [];
+let messages = [];
 
 exports.handler = async (event) => {
     if (event.httpMethod === 'POST') {
-        const { item } = JSON.parse(event.body);
-        if (item && !items.find(msg => msg.text === item.text)) {
-            const id = Date.now().toString(); // Unique ID based on timestamp
-            items.push({ id, ...item });
+        const { username, message } = JSON.parse(event.body);
+        if (username.trim() && message.trim() && message.length <= 1000) {
+            messages.push({ username, message });
             return {
                 statusCode: 200,
-                body: JSON.stringify({ success: true, items }),
+                body: JSON.stringify({ success: true, messages }),
             };
         }
         return {
@@ -18,14 +17,7 @@ exports.handler = async (event) => {
     } else if (event.httpMethod === 'GET') {
         return {
             statusCode: 200,
-            body: JSON.stringify({ items }),
-        };
-    } else if (event.httpMethod === 'DELETE') {
-        const id = event.queryStringParameters.id;
-        items = items.filter(msg => msg.id !== id);
-        return {
-            statusCode: 200,
-            body: JSON.stringify({ success: true }),
+            body: JSON.stringify({ messages }),
         };
     }
 
