@@ -80,8 +80,8 @@
     </div>
     <div id="authContainer" class="auth-container">
         <input type="text" id="username" placeholder="Enter username">
+        <input type="password" id="password" placeholder="Enter password">
         <button id="loginButton" class="btn">Login</button>
-        <button id="logoutButton" class="btn hidden">Logout</button>
         <p>Don't have an account? <a href="register.html">Make one</a></p>
     </div>
 </div>
@@ -93,8 +93,8 @@
     const chatInput = document.getElementById('chatInput');
     const sendButton = document.getElementById('sendButton');
     const loginButton = document.getElementById('loginButton');
-    const logoutButton = document.getElementById('logoutButton');
     const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
 
     let username = localStorage.getItem('username');
 
@@ -104,7 +104,7 @@
 
     loginButton.addEventListener('click', async () => {
         const user = usernameInput.value.trim();
-        const password = prompt("Enter your password:");
+        const password = passwordInput.value.trim();
 
         if (user && password) {
             const response = await fetch('/.netlify/functions/users', {
@@ -119,12 +119,9 @@
             } else {
                 alert('Invalid username or password.');
             }
+        } else {
+            alert('Please enter both username and password.');
         }
-    });
-
-    logoutButton.addEventListener('click', () => {
-        localStorage.removeItem('username');
-        location.reload();
     });
 
     sendButton.addEventListener('click', sendMessage);
@@ -167,8 +164,6 @@
         });
         chatBox.scrollTop = chatBox.scrollHeight;
     }
-
-    logoutButton.classList.remove('hidden');
 </script>
 </body>
 </html>
