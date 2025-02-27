@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anonymous Live Chat</title>
+    <title>Login/Signup</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -12,40 +12,29 @@
             padding: 0;
             color: #fff;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             height: 100vh;
         }
-        .chat-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 20px;
-            overflow-y: auto;
-        }
-        .message {
-            margin: 5px 0;
-            padding: 10px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-        }
-        .username {
-            font-weight: bold;
-            margin-right: 10px;
-        }
-        .input-container {
-            display: flex;
-            padding: 10px;
+        .container {
             background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+            width: 300px;
+            text-align: center;
+            position: relative;
         }
-        input[type="text"] {
-            flex: 1;
+        h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
             padding: 10px;
+            margin: 10px 0;
             border: none;
             border-radius: 4px;
-            margin-right: 10px;
             background: rgba(255, 255, 255, 0.2);
             color: #fff;
         }
@@ -57,56 +46,91 @@
             color: white;
             cursor: pointer;
             transition: background-color 0.3s;
+            width: 100%;
         }
         button:hover {
             background-color: #45a049;
         }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .logout {
+        .toggle {
+            margin-top: 20px;
             color: #fff;
             cursor: pointer;
+        }
+        .back-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .back-button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Anonymous Live Chat</h1>
-        <button onclick="window.location.href='login.html'">Login/Signup</button>
-    </div>
-    <div class="chat-container" id="chatContainer"></div>
-    <div class="input-container">
-        <input type="text" id="usernameInput" placeholder="Enter your name" maxlength="15" required>
-        <input type="text" id="messageInput" placeholder="Type your message" maxlength="1000" required>
-        <button id="sendButton">Send</button>
+    <div class="container">
+        <button class="back-button" onclick="window.location.href='index.html'">Back to Chat</button>
+        <h1 id="formTitle">Login</h1>
+        <form id="loginForm">
+            <input type="text" id="loginUsername" placeholder="Username" required>
+            <input type="password" id="loginPassword" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <div class="toggle" id="signupToggle">Don't have an account? <span id="toggleSignup" style="color: #4CAF50;">Sign Up</span></div>
+
+        <form id="signupForm" style="display:none;">
+            <h1 id="signupTitle">Sign Up</h1>
+            <input type="text" id="signupUsername" placeholder="Username" required>
+            <input type="password" id="signupPassword" placeholder="Password" required>
+            <button type="submit">Sign Up</button>
+        </form>
+        <div class="toggle" id="toggleLogin" style="display:none;">Already have an account? <span style="color: #4CAF50;">Login</span></div>
     </div>
 
     <script>
-        const chatContainer = document.getElementById('chatContainer');
-        const usernameInput = document.getElementById('usernameInput');
-        const messageInput = document.getElementById('messageInput');
-        const sendButton = document.getElementById('sendButton');
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const toggleSignup = document.getElementById('toggleSignup');
+        const toggleLogin = document.getElementById('toggleLogin');
+        const signupToggle = document.getElementById('signupToggle');
+        const formTitle = document.getElementById('formTitle');
 
-        function addMessage(username, message) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message');
-            messageElement.innerHTML = `<span class="username">${username}:</span> ${message}`;
-            chatContainer.appendChild(messageElement);
-            chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll to bottom
-        }
+        toggleSignup.addEventListener('click', () => {
+            loginForm.style.display = 'none';
+            signupForm.style.display = 'block';
+            signupToggle.style.display = 'none'; // Hide the "Don't have an account?" link
+            toggleLogin.style.display = 'block';
+            formTitle.style.display = 'none'; // Hide the login title
+        });
 
-        sendButton.addEventListener('click', () => {
-            const username = usernameInput.value.trim();
-            const message = messageInput.value.trim();
-            if (username && message) {
-                addMessage(username, message);
-                messageInput.value = ''; // Clear input
-            } else {
-                alert('Username and message cannot be empty or just spaces.');
-            }
+        toggleLogin.addEventListener('click', () => {
+            signupForm.style.display = 'none';
+            loginForm.style.display = 'block';
+            toggleLogin.style.display = 'none';
+            signupToggle.style.display = 'block'; // Show the "Don't have an account?" link
+            formTitle.style.display = 'block'; // Show the login title
+        });
+
+        loginForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            // Add your login logic here
+            alert(`Logging in with username: ${username}`);
+        });
+
+        signupForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const username = document.getElementById('signupUsername').value;
+            const password = document.getElementById('signupPassword').value;
+            // Add your signup logic here
+            alert(`Signing up with username: ${username}`);
         });
     </script>
 </body>
