@@ -1,23 +1,26 @@
-let items = [];
+let messages = [];
 
 exports.handler = async (event) => {
     if (event.httpMethod === 'POST') {
-        const { item } = JSON.parse(event.body);
-        if (item && !items.includes(item)) {
-            items.push(item);
+        const { message } = JSON.parse(event.body);
+        if (message && message.length <= 1000) {
+            messages.push(message);
+            if (messages.length > 50) messages.shift();
             return {
                 statusCode: 200,
-                body: JSON.stringify({ success: true, items }),
+                body: JSON.stringify({ success: true }),
             };
         }
         return {
             statusCode: 400,
-            body: JSON.stringify({ success: false }),
+            body: JSON.stringify({ success: false, error: "Message too long or empty" }),
         };
-    } else if (event.httpMethod === 'GET') {
+    }
+
+    if (event.httpMethod === 'GET') {
         return {
             statusCode: 200,
-            body: JSON.stringify({ items }),
+            body: JSON.stringify({ messages }),
         };
     }
 
