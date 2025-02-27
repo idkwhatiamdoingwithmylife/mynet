@@ -1,51 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Send Message</title>
-</head>
-<body>
-    <input type="text" id="message" placeholder="Type your message">
-    <button onclick="sendMessage()">Send</button>
-    <div id="status">Checking connection...</div>
+import express from "express";
 
-    <script>
-        async function sendMessage() {
-            const message = document.getElementById("message").value;
-            if (!message) return alert("Please enter a message.");
+const app = express();
+app.use(express.json());
 
-            const response = await fetch("https://funny-marigold-5eed7d.netlify.app/api/api.js", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ message })
-            });
+let latestMessage = "";
 
-            if (response.ok) {
-                alert("Message sent!");
-            } else {
-                alert("Failed to send message.");
-            }
-        }
+app.post("/api/api.js", (req, res) => {
+    const { message } = req.body;
+    if (!message) return res.status(400).json({ error: "No message provided" });
 
-        async function checkConnection() {
-            try {
-                const response = await fetch("https://funny-marigold-5eed7d.netlify.app/api/api.js");
-                const statusDiv = document.getElementById("status");
-                if (response.ok) {
-                    statusDiv.innerText = "API is connected.";
-                } else {
-                    statusDiv.innerText = "API is not connected.";
-                }
-            } catch (error) {
-                const statusDiv = document.getElementById("status");
-                statusDiv.innerText = "API is not connected.";
-            }
-        }
+    latestMessage = message;
+    res.json({ success: true });
+});
 
-        window.onload = checkConnection;
-    </script>
-</body>
-</html>
+app.get("/api/api.js", (req, res) => {
+    res.json({ message: latestMessage, connected: true });
+});
+
+app.listen(3000, () => console.log("API running on port 3000"));
