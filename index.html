@@ -3,25 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your App</title>
-</head>
-<body>
-    <div id="message">Connecting...</div>
-    
+    <title>Connection Status</title>
     <script>
-        async function connectToApi() {
-            const response = await fetch('/api/api.js', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
+        async function checkConnection() {
+            const response = await fetch('/api/api.js');
             const data = await response.json();
-            document.getElementById('message').innerText = data.message;
+            document.getElementById('status').innerText = data.message;
         }
 
-        connectToApi();
+        window.onload = checkConnection;
     </script>
+</head>
+<body>
+    <h1 id="status">Connecting...</h1>
 </body>
 </html>
