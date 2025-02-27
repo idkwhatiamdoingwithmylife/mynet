@@ -1,8 +1,7 @@
-let messages = []; // In-memory storage for messages
+let messages = [];
 
 exports.handler = async (event) => {
     if (event.httpMethod === 'GET') {
-        // Return all messages
         return {
             statusCode: 200,
             body: JSON.stringify(messages),
