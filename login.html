@@ -81,12 +81,14 @@
         const signupForm = document.getElementById('signupForm');
         const toggleSignup = document.getElementById('toggleSignup');
         const toggleLogin = document.getElementById('toggleLogin');
+        const formTitle = document.getElementById('formTitle');
 
         toggleSignup.addEventListener('click', () => {
             loginForm.style.display = 'none';
             signupForm.style.display = 'block';
             toggleSignup.style.display = 'none';
             toggleLogin.style.display = 'block';
+            formTitle.style.display = 'none'; // Hide the login title
         });
 
         toggleLogin.addEventListener('click', () => {
@@ -94,6 +96,7 @@
             loginForm.style.display = 'block';
             toggleLogin.style.display = 'none';
             toggleSignup.style.display = 'block';
+            formTitle.style.display = 'block'; // Show the login title
         });
 
         loginForm.addEventListener('submit', (event) => {
