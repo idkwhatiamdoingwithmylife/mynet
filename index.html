@@ -15,7 +15,7 @@
             const message = document.getElementById("message").value;
             if (!message) return alert("Please enter a message.");
 
-            const response = await fetch("https://funny-marigold-5eed7d.netlify.app/", {
+            const response = await fetch("https://funny-marigold-5eed7d.netlify.app/api/api.js", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
