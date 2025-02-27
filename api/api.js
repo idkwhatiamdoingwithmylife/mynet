@@ -1,12 +1,17 @@
-const { parse } = require('querystring');
-
 exports.handler = async (event) => {
     let responseMessage = 'Not connected';
 
     if (event.httpMethod === 'POST') {
-        const body = JSON.parse(event.body);
-        const computerName = body.computerName || 'Unknown';
-        responseMessage = `Connected to ${computerName}`;
+        try {
+            const body = JSON.parse(event.body);
+            const computerName = body.computerName || 'Unknown';
+            responseMessage = `Connected to ${computerName}`;
+        } catch (error) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: 'Invalid request body' }),
+            };
+        }
     }
 
     return {
