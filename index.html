@@ -3,167 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Room</title>
+    <title>Wheat Word Manager</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 90%;
-            max-width: 600px;
-            margin: 100px auto;
-            background: white;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
         }
-        h1 {
-            text-align: center;
-            color: #343a40;
-            margin-bottom: 20px;
-        }
-        .chat-box {
-            border: 1px solid #ddd;
-            height: 300px;
-            overflow-y: scroll;
-            padding: 10px;
+        input[type="text"] {
             margin-bottom: 10px;
-            background-color: #e9ecef;
-            border-radius: 5px;
-        }
-        .chat-input {
-            width: calc(100% - 50px);
-            padding: 10px;
-            margin-right: 10px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-        .btn {
-            padding: 10px 20px;
-            background-color: #007bff;
-            border: none;
-            color: white;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-        .btn:hover {
-            background-color: #0056b3;
-        }
-        .hidden {
-            display: none;
-        }
-        .auth-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .auth-container a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        .auth-container a:hover {
-            text-decoration: underline;
         }
     </style>
 </head>
 <body>
+    <h1>Wheat Word Manager</h1>
+    <form id="wheatForm">
+        <input type="text" id="wheatWord" placeholder="Enter a wheat word" required>
+        <button type="submit">Add Wheat Word</button>
+    </form>
+    <h2>Wheat Words:</h2>
+    <ul id="wheatList"></ul>
 
-<div class="container">
-    <h1>Chat Room</h1>
-    <div id="chatContainer" class="hidden">
-        <div id="chatBox" class="chat-box"></div>
-        <input type="text" id="chatInput" class="chat-input" placeholder="Type a message...">
-        <button id="sendButton" class="btn">Send</button>
-    </div>
-    <div id="authContainer" class="auth-container">
-        <input type="text" id="username" placeholder="Enter username">
-        <input type="password" id="password" placeholder="Enter password">
-        <button id="loginButton" class="btn">Login</button>
-        <p>Don't have an account? <a href="register.html">Make one</a></p>
-    </div>
-</div>
-
-<script>
-    const chatContainer = document.getElementById('chatContainer');
-    const authContainer = document.getElementById('authContainer');
-    const chatBox = document.getElementById('chatBox');
-    const chatInput = document.getElementById('chatInput');
-    const sendButton = document.getElementById('sendButton');
-    const loginButton = document.getElementById('loginButton');
-    const usernameInput = document.getElementById('username');
-    const passwordInput = document.getElementById('password');
-
-    let username = localStorage.getItem('username');
-
-    if (username) {
-        login(username);
-    }
-
-    loginButton.addEventListener('click', async () => {
-        const user = usernameInput.value.trim();
-        const password = passwordInput.value.trim();
-
-        if (user && password) {
-            const response = await fetch('/.netlify/functions/users', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: user, password })
-            });
-
-            if (response.ok) {
-                localStorage.setItem('username', user);
-                login(user);
-            } else {
-                alert('Invalid username or password.');
-            }
-        } else {
-            alert('Please enter both username and password.');
-        }
-    });
-
-    sendButton.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
-    });
-
-    function login(user) {
-        username = user;
-        chatContainer.classList.remove('hidden');
-        authContainer.classList.add('hidden');
-        loadMessages();
-    }
-
-    async function sendMessage() {
-        const message = chatInput.value.trim();
-        if (message) {
-            await fetch('/.netlify/functions/messages', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, message })
-            });
-            chatInput.value = '';
-            loadMessages();
-        }
-    }
-
-    async function loadMessages() {
-        const response = await fetch('/.netlify/functions/messages');
-        const messages = await response.json();
-        chatBox.innerHTML = '';
-        messages.forEach(msg => {
-            const messageElement = document.createElement('div');
-            messageElement.textContent = `${msg.username}: ${msg.message}`;
-            chatBox.appendChild(messageElement);
-        });
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
-</script>
+    <script src="api/api.js"></script>
 </body>
 </html>
