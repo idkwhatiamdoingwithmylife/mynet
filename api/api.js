@@ -4,6 +4,7 @@ const app = express();
 app.use(express.json());
 
 let latestMessage = "";
+let isConnected = true; // Update this variable based on your connection logic
 
 app.post("/api/api.js", (req, res) => {
     const { message } = req.body;
@@ -15,6 +16,10 @@ app.post("/api/api.js", (req, res) => {
 
 app.get("/api/api.js", (req, res) => {
     res.json({ message: latestMessage });
+});
+
+app.get("/status", (req, res) => {
+    res.json({ connected: isConnected });
 });
 
 app.listen(3000, () => console.log("API running on port 3000"));
