@@ -1,41 +1,84 @@
-let items = [];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Item Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        input[type="text"] {
+            margin-bottom: 10px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 5px 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simple Item Manager</h1>
+    <form id="itemForm">
+        <input type="text" id="itemInput" placeholder="Enter an item" required>
+        <button type="submit">Add Item</button>
+    </form>
+    <h2>Items:</h2>
+    <ul id="itemList"></ul>
 
-// Function to add an item
-function addItem(item) {
-    if (item && !items.includes(item)) {
-        items.push(item);
-        return true;
-    }
-    return false;
-}
+    <script>
+        const itemForm = document.getElementById('itemForm');
+        const itemList = document.getElementById('itemList');
 
-// Function to get all items
-function getItems() {
-    return items;
-}
+        // Function to fetch items from the server
+        async function fetchItems() {
+            const response = await fetch('/.netlify/functions/items');
+            const data = await response.json();
+            displayItems(data.items);
+        }
 
-// Event listener for form submission
-document.getElementById('itemForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const itemInput = document.getElementById('itemInput');
-    const item = itemInput.value.trim();
+        // Function to display items
+        function displayItems(items) {
+            itemList.innerHTML = '';
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                itemList.appendChild(li);
+            });
+        }
 
-    if (addItem(item)) {
-        itemInput.value = '';
-        displayItems();
-    } else {
-        alert('Item already exists or is invalid.');
-    }
-});
+        // Event listener for form submission
+        itemForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const itemInput = document.getElementById('itemInput');
+            const item = itemInput.value.trim();
 
-// Function to display items
-function displayItems() {
-    const itemList = document.getElementById('itemList');
-    itemList.innerHTML = '';
-    const itemsToDisplay = getItems();
-    itemsToDisplay.forEach(function(item) {
-        const li = document.createElement('li');
-        li.textContent = item;
-        itemList.appendChild(li);
-    });
-}
+            // Send the new item to the server
+            const response = await fetch('/.netlify/functions/items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ item })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                itemInput.value = '';
+                fetchItems(); // Refresh the item list
+            } else {
+                alert('Item already exists or is invalid.');
+            }
+        });
+
+        // Initial fetch to display items
+        fetchItems();
+    </script>
+</body>
+</html>
