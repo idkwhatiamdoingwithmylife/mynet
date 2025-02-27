@@ -54,6 +54,9 @@
             border-radius: 4px;
             font-size: 0.9em;
             border-left: 5px solid #4CAF50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             transition: background-color 0.3s;
         }
         li:hover {
@@ -91,6 +94,14 @@
         button:hover {
             background-color: #45a049;
         }
+        .delete-button {
+            background-color: transparent;
+            border: none;
+            color: #ff4d4d;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
         @media (max-width: 600px) {
             .name-input, #itemInput {
                 width: 100%;
@@ -111,7 +122,6 @@
     </div>
 
     <script>
-        const itemForm = document.getElementById('itemForm');
         const itemList = document.getElementById('itemList');
 
         async function fetchItems() {
@@ -124,7 +134,7 @@
             itemList.innerHTML = '';
             items.forEach(item => {
                 const li = document.createElement('li');
-                li.textContent = item;
+                li.innerHTML = `${item.text} <button class="delete-button" onclick="deleteMessage('${item.id}')">Delete</button>`;
                 itemList.appendChild(li);
             });
             itemList.scrollTop = itemList.scrollHeight; // Scroll to the bottom
@@ -142,7 +152,7 @@
                 return;
             }
 
-            const message = `${name}: ${item}`;
+            const message = { name: name, text: item };
 
             const response = await fetch('/.netlify/functions/chat', {
                 method: 'POST',
@@ -158,6 +168,19 @@
                 alert('Message is invalid.');
             }
         });
+
+        async function deleteMessage(id) {
+            const response = await fetch(`/.netlify/functions/chat?id=${id}`, {
+                method: 'DELETE',
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                fetchItems();
+            } else {
+                alert('Failed to delete message.');
+            }
+        }
 
         fetchItems();
     </script>
