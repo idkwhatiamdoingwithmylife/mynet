@@ -10,23 +10,19 @@
             text-align: center;
             margin-top: 50px;
         }
-        #status {
-            font-size: 24px;
-            color: green;
-        }
     </style>
 </head>
 <body>
-    <h1>Connection Status</h1>
-    <div id="status">Not Connected</div>
+    <div id="content">Loading...</div>
 
     <script>
-        fetch('https://funny-marigold-5eed7d.netlify.app/api/api.js')
-            .then(response => response.json())
-            .then(data => {
-                if (data.message) {
-                    document.getElementById('status').innerText = 'Connected to: ' + data.message;
-                }
+        const deviceName = 'YourDeviceName'; // Replace with actual device name
+        const apiUrl = `https://funny-marigold-5eed7d.netlify.app/api/api.js?message=Connected: ${deviceName}`;
+
+        fetch(apiUrl)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('content').innerHTML = html;
             })
             .catch(error => {
                 console.error('Error fetching connection status:', error);
