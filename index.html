@@ -3,66 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Anonymous Chat</title>
+    <title>Simple Item Manager</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
         }
-        #chat {
-            border: 1px solid #ddd;
-            padding: 10px;
-            height: 300px;
-            overflow-y: auto;
+        input[type="text"] {
             margin-bottom: 10px;
         }
-        input[type="text"] {
-            width: calc(100% - 80px);
-            margin-right: 10px;
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 5px 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
-    <h1>Live Anonymous Chat</h1>
-    <div id="chat"></div>
-    <input type="text" id="messageInput" placeholder="Type your message..." required>
-    <button id="sendButton">Send</button>
+    <h1>Simple Item Manager</h1>
+    <form id="itemForm">
+        <input type="text" id="itemInput" placeholder="Enter an item" required>
+        <button type="submit">Add Item</button>
+    </form>
+    <h2>Items:</h2>
+    <ul id="itemList"></ul>
 
     <script>
-        const chatDiv = document.getElementById('chat');
-        const messageInput = document.getElementById('messageInput');
-        const sendButton = document.getElementById('sendButton');
+        const itemForm = document.getElementById('itemForm');
+        const itemList = document.getElementById('itemList');
 
-        const socket = new WebSocket('wss://your-websocket-url'); // Update with your WebSocket URL
-
-        // Function to display messages
-        function displayMessage(message) {
-            const div = document.createElement('div');
-            div.textContent = message;
-            chatDiv.appendChild(div);
-            chatDiv.scrollTop = chatDiv.scrollHeight; // Scroll to the bottom
+        // Function to fetch items from the server
+        async function fetchItems() {
+            const response = await fetch('/.netlify/functions/items');
+            const data = await response.json();
+            displayItems(data.items);
         }
 
-        // Listen for messages from the server
-        socket.addEventListener('message', function(event) {
-            displayMessage(event.data);
-        });
+        function displayItems(items) {
+            itemList.innerHTML = '';
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                itemList.appendChild(li);
+            });
+        }
 
-        // Send message on button click
-        sendButton.addEventListener('click', function() {
-            const message = messageInput.value.trim();
-            if (message) {
-                socket.send(message);
-                messageInput.value = ''; // Clear input
+        itemForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const itemInput = document.getElementById('itemInput');
+            const item = itemInput.value.trim();
+
+            const response = await fetch('/.netlify/functions/items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ item })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                itemInput.value = '';
+                fetchItems();
+            } else {
+                alert('Item already exists or is invalid.');
             }
         });
 
-        // Optionally send message on Enter key
-        messageInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                sendButton.click();
-            }
-        });
+        // Initial fetch to display items
+        fetchItems();
     </script>
 </body>
 </html>
