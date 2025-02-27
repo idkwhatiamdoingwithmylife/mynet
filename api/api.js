@@ -1,41 +1,41 @@
-let messages = [];
+let items = [];
 
-function addMessage(username, message) {
-    if (username && message) {
-        messages.push({ username, message });
+function addItem(item) {
+    if (item && item.length <= 1000) {
+        items.push(item);
         return true;
     }
     return false;
 }
 
-function getMessages() {
-    return messages;
+function getItems() {
+    return items;
 }
 
-document.getElementById('sendButton').addEventListener('click', function() {
-    const usernameInput = document.getElementById('usernameInput');
-    const messageInput = document.getElementById('messageInput');
-    const username = usernameInput.value.trim();
-    const message = messageInput.value.trim();
+document.getElementById('itemForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const nameInput = document.getElementById('nameInput');
+    const itemInput = document.getElementById('itemInput');
+    const name = nameInput.value.trim() || 'Anonymous';
+    const item = itemInput.value.trim();
 
-    if (username && message) {
-        addMessage(username, message);
-        messageInput.value = ''; // Clear input
-        updateChat();
+    const message = `${name}: ${item}`;
+
+    if (addItem(message)) {
+        itemInput.value = '';
+        displayItems();
     } else {
-        alert('Username and message cannot be empty or just spaces.');
+        alert('Message is invalid.');
     }
 });
 
-function updateChat() {
-    const chatContainer = document.getElementById('chatContainer');
-    chatContainer.innerHTML = ''; // Clear previous messages
-    const allMessages = getMessages();
-    allMessages.forEach(msg => {
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message');
-        messageElement.innerHTML = `<span class="username">${msg.username}:</span> ${msg.message}`;
-        chatContainer.appendChild(messageElement);
+function displayItems() {
+    const itemList = document.getElementById('itemList');
+    itemList.innerHTML = '';
+    const itemsToDisplay = getItems();
+    itemsToDisplay.forEach(function(item) {
+        const li = document.createElement('li');
+        li.textContent = item;
+        itemList.appendChild(li);
     });
-    chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll to bottom
 }
