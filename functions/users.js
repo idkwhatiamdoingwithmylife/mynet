@@ -1,23 +1,44 @@
-const users = [];
+const fs = require('fs');
+const path = require('path');
 
 exports.handler = async (event) => {
+    const usersFilePath = path.join(__dirname, 'users.json');
+
     if (event.httpMethod === 'POST') {
         const { username, password } = JSON.parse(event.body);
+        let users = [];
 
-        if (event.path.endsWith('/users')) {
-            if (users.find(user => user.username === username)) {
-                return { statusCode: 400, body: 'User already exists' };
-            }
-            users.push({ username, password });
-            return { statusCode: 201, body: 'User created' };
-        } else if (event.path.endsWith('/login')) {
-            const user = users.find(user => user.username === username && user.password === password);
-            if (user) {
-                return { statusCode: 200, body: 'Login successful' };
-            } else {
-                return { statusCode: 401, body: 'Invalid username or password' };
-            }
+        if (fs.existsSync(usersFilePath)) {
+            const data = fs.readFileSync(usersFilePath);
+            users = JSON.parse(data);
         }
+
+        const userExists = users.some(user => user.username === username);
+
+        if (userExists) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: 'User already exists' })
+            };
+        }
+
+        users.push({ username, password });
+        fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: 'User created successfully' })
+        };
+    } else if (event.httpMethod === 'GET') {
+        // Handle user login if necessary
+        return {
+            statusCode: 405,
+            body: JSON.stringify({ message: 'Method not allowed' })
+        };
     }
-    return { statusCode: 405, body: 'Method Not Allowed' };
+
+    return {
+        statusCode: 405,
+        body: JSON.stringify({ message: 'Method not allowed' })
+    };
 };
