@@ -4,16 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Computer Name Display</title>
-</head>
-<body>
-    <h1 id="computerName">Not connected</h1>
     <script>
         async function fetchComputerName() {
-            const response = await fetch('/api/name');
+            const response = await fetch('/api/computer-name');
             const data = await response.json();
-            document.getElementById('computerName').innerText = data.message;
+            document.getElementById('computer-name').innerText = data.name;
         }
-        fetchComputerName();
+
+        setInterval(fetchComputerName, 100); // Update every 0.1 seconds
     </script>
+</head>
+<body>
+    <h1>Connected Computer Name:</h1>
+    <p id="computer-name">Loading...</p>
 </body>
 </html>
