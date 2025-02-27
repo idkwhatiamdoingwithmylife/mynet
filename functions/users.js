@@ -2,43 +2,47 @@ const fs = require('fs');
 const path = require('path');
 
 exports.handler = async (event) => {
-    const usersFilePath = path.join(__dirname, 'users.json');
+    const dataPath = path.join(__dirname, 'users.json');
+
+    // Read existing users
+    const readUsers = () => {
+        if (fs.existsSync(dataPath)) {
+            const data = fs.readFileSync(dataPath);
+            return JSON.parse(data);
+        }
+        return [];
+    };
+
+    // Write users to file
+    const writeUsers = (users) => {
+        fs.writeFileSync(dataPath, JSON.stringify(users, null, 2));
+    };
 
     if (event.httpMethod === 'POST') {
-        const { username, password } = JSON.parse(event.body);
-        let users = [];
+        const body = JSON.parse(event.body);
+        const users = readUsers();
 
-        if (fs.existsSync(usersFilePath)) {
-            const data = fs.readFileSync(usersFilePath);
-            users = JSON.parse(data);
-        }
-
-        const userExists = users.some(user => user.username === username);
-
-        if (userExists) {
+        // Check if user already exists
+        const existingUser = users.find(user => user.username === body.username);
+        if (existingUser) {
             return {
                 statusCode: 400,
-                body: JSON.stringify({ message: 'User already exists' })
+                body: JSON.stringify({ message: 'Username already exists.' }),
             };
         }
 
-        users.push({ username, password });
-        fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
+        // Create a new user
+        users.push({ username: body.username, password: body.password });
+        writeUsers(users);
 
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: 'User created successfully' })
-        };
-    } else if (event.httpMethod === 'GET') {
-        // Handle user login if necessary
-        return {
-            statusCode: 405,
-            body: JSON.stringify({ message: 'Method not allowed' })
+            body: JSON.stringify({ message: 'User registered successfully.' }),
         };
     }
 
     return {
         statusCode: 405,
-        body: JSON.stringify({ message: 'Method not allowed' })
+        body: JSON.stringify({ message: 'Method not allowed.' }),
     };
 };
