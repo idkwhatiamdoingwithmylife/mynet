@@ -3,24 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Computer Connection</title>
+    <title>Computer Name Display</title>
 </head>
 <body>
-    <h1 id="message">Not connected</h1>
-    <script>
-        async function fetchComputerName() {
-            const response = await fetch('/.netlify/functions/api', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ computerName: 'YourComputerName' }), // Placeholder
-            });
-            const data = await response.json();
-            document.getElementById('message').textContent = data.message;
-        }
-
-        fetchComputerName();
-    </script>
+    <h1 id="computerName">Not connected</h1>
+    <script src="/api/api.js"></script>
 </body>
 </html>
