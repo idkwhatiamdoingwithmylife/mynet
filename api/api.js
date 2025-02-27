@@ -1,12 +1,9 @@
 module.exports = async (req, res) => {
-    const encodedMessage = req.query.message;
+    const deviceName = req.query.deviceName;
 
-    let htmlResponse = '<h1>Connection Status</h1><div id="status">Not Connected</div>';
-
-    if (encodedMessage) {
-        const deviceName = encodedMessage.split(': ')[1];
-        htmlResponse = `<h1>Connection Status</h1><div id="status">Connected to: ${deviceName}</div>`;
+    if (deviceName) {
+        res.status(200).json({ deviceName });
+    } else {
+        res.status(400).json({ error: 'No device name provided' });
     }
-
-    res.status(200).send(htmlResponse);
 };
