@@ -5,14 +5,13 @@ exports.handler = async (event) => {
         const data = JSON.parse(event.body);
         const message = data.message;
 
-        // Return the received message
         return {
             statusCode: 200,
             body: JSON.stringify({ message }),
         };
     }
 
-    // Handle GET request (optional)
+    // Optional: handle GET requests
     return {
         statusCode: 200,
         body: JSON.stringify({ message: "No message sent." }),
