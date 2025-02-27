@@ -13,17 +13,17 @@
             color: #fff;
             display: flex;
             flex-direction: column;
+            justify-content: flex-start;
             align-items: center;
             height: 100vh;
         }
         .container {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            padding: 30px;
+            padding: 20px;
             box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
-            width: 400px;
-            max-height: 80vh;
-            overflow-y: auto;
+            width: 300px;
+            text-align: center;
             margin-top: 20px;
         }
         h1 {
@@ -31,7 +31,7 @@
             margin-bottom: 20px;
         }
         input[type="text"] {
-            width: calc(100% - 20px);
+            width: 100%;
             padding: 10px;
             margin: 10px 0;
             border: none;
@@ -52,61 +52,98 @@
         button:hover {
             background-color: #45a049;
         }
-        .message {
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+        li {
             margin: 5px 0;
             padding: 10px;
             background-color: rgba(255, 255, 255, 0.3);
             border-radius: 4px;
-            text-align: left;
+            word-wrap: break-word;
         }
-        .back-button {
+        .message-form {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .toggle {
             position: absolute;
             top: 10px;
             right: 10px;
-            padding: 5px 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .back-button:hover {
-            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <button class="back-button" onclick="window.location.href='login.html'">Logout</button>
     <h1>Anonymous Live Chat</h1>
-    <div class="container" id="messageContainer"></div>
-    <input type="text" id="usernameInput" placeholder="Enter your display name" maxlength="15" required>
-    <input type="text" id="messageInput" placeholder="Type your message" maxlength="1000" required>
-    <button id="sendMessage">Send</button>
+    <div class="container">
+        <ul id="messageList"></ul>
+        <div class="message-form">
+            <input type="text" id="username" placeholder="Enter your name" maxlength="15" required>
+            <input type="text" id="message" placeholder="Type a message" maxlength="1000" required>
+            <button id="sendMessage">Send</button>
+        </div>
+        <div class="toggle">
+            <button onclick="window.location.href='login.html'">Login/Signup</button>
+        </div>
+    </div>
 
     <script>
-        const messageContainer = document.getElementById('messageContainer');
-        const messageInput = document.getElementById('messageInput');
-        const usernameInput = document.getElementById('usernameInput');
+        const messageList = document.getElementById('messageList');
+        const sendMessageButton = document.getElementById('sendMessage');
 
-        function displayMessage(username, message) {
-            const div = document.createElement('div');
-            div.classList.add('message');
-            div.textContent = `${username}: ${message}`;
-            messageContainer.appendChild(div);
-            messageContainer.scrollTop = messageContainer.scrollHeight; // Scroll to bottom
+        // Function to fetch messages from the server
+        async function fetchMessages() {
+            const response = await fetch('/.netlify/functions/chat');
+            const data = await response.json();
+            displayMessages(data.messages);
         }
 
-        document.getElementById('sendMessage').addEventListener('click', () => {
+        // Function to display messages
+        function displayMessages(messages) {
+            messageList.innerHTML = '';
+            messages.forEach(msg => {
+                const li = document.createElement('li');
+                li.textContent = `${msg.username}: ${msg.text}`;
+                messageList.appendChild(li);
+            });
+        }
+
+        // Event listener for sending messages
+        sendMessageButton.addEventListener('click', async function() {
+            const usernameInput = document.getElementById('username');
+            const messageInput = document.getElementById('message');
             const username = usernameInput.value.trim();
             const message = messageInput.value.trim();
+
             if (username && message) {
-                displayMessage(username, message);
-                messageInput.value = ''; // Clear the message input
+                const response = await fetch('/.netlify/functions/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, text: message })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    messageInput.value = ''; // Clear the input field
+                    fetchMessages(); // Refresh the message list
+                } else {
+                    alert('Error sending message.');
+                }
             } else {
-                alert('Both username and message are required!');
+                alert('Username and message cannot be empty or just spaces.');
             }
         });
+
+        // Initial fetch to display messages
+        fetchMessages();
     </script>
 </body>
 </html>
