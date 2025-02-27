@@ -1,41 +1,36 @@
-let items = [];
+const messageContainer = document.getElementById('messageContainer');
+const messageInput = document.getElementById('messageInput');
+const usernameInput = document.getElementById('usernameInput');
 
-function addItem(item) {
-    if (item && item.length <= 1000) {
-        items.push(item);
-        return true;
-    }
-    return false;
+async function fetchMessages() {
+    const response = await fetch('/.netlify/functions/chat');
+    const data = await response.json();
+    data.messages.forEach(msg => displayMessage(msg.username, msg.message));
 }
 
-function getItems() {
-    return items;
-}
-
-document.getElementById('itemForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const nameInput = document.getElementById('nameInput');
-    const itemInput = document.getElementById('itemInput');
-    const name = nameInput.value.trim() || 'Anonymous';
-    const item = itemInput.value.trim();
-
-    const message = `${name}: ${item}`;
-
-    if (addItem(message)) {
-        itemInput.value = '';
-        displayItems();
+async function sendMessage() {
+    const username = usernameInput.value.trim();
+    const message = messageInput.value.trim();
+    if (username && message) {
+        await fetch('/.netlify/functions/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, message }),
+        });
+        displayMessage(username, message);
+        messageInput.value = '';
     } else {
-        alert('Message is invalid.');
+        alert('Both username and message are required!');
     }
-});
-
-function displayItems() {
-    const itemList = document.getElementById('itemList');
-    itemList.innerHTML = '';
-    const itemsToDisplay = getItems();
-    itemsToDisplay.forEach(function(item) {
-        const li = document.createElement('li');
-        li.textContent = item;
-        itemList.appendChild(li);
-    });
 }
+
+function displayMessage(username, message) {
+    const div = document.createElement('div');
+    div.classList.add('message');
+    div.textContent = `${username}: ${message}`;
+    messageContainer.appendChild(div);
+    messageContainer.scrollTop = messageContainer.scrollHeight;
+}
+
+document.getElementById('sendMessage').addEventListener('click', sendMessage);
+fetchMessages();
