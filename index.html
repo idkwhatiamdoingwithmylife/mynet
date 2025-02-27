@@ -3,82 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Item Manager</title>
+    <title>Live Anonymous Chat</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-        input[type="text"] {
-            margin-bottom: 10px;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            margin: 5px 0;
-            padding: 10px;
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        #chat-box { width: 100%; height: 300px; border: 1px solid #ccc; overflow-y: auto; padding: 10px; margin-bottom: 10px; }
+        #message { width: 80%; padding: 5px; }
+        #send { padding: 5px; }
     </style>
 </head>
 <body>
-    <h1>Simple Item Manager</h1>
-    <form id="itemForm">
-        <input type="text" id="itemInput" placeholder="Enter an item" required>
-        <button type="submit">Add Item</button>
-    </form>
-    <h2>Items:</h2>
-    <ul id="itemList"></ul>
+    <h1>Live Anonymous Chat</h1>
+    <div id="chat-box"></div>
+    <input type="text" id="message" placeholder="Type a message..." autocomplete="off">
+    <button id="send">Send</button>
 
     <script>
-        const itemForm = document.getElementById('itemForm');
-        const itemList = document.getElementById('itemList');
+        const chatBox = document.getElementById('chat-box');
+        const messageInput = document.getElementById('message');
+        const sendButton = document.getElementById('send');
 
-        // Function to fetch items from the server
-        async function fetchItems() {
-            const response = await fetch('/.netlify/functions/items');
+        // Fetch messages every second to update the chat live
+        async function fetchMessages() {
+            const response = await fetch('/.netlify/functions/chat');
             const data = await response.json();
-            displayItems(data.items);
+            chatBox.innerHTML = data.messages.map(msg => `<p>${msg}</p>`).join('');
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        // Function to display items
-        function displayItems(items) {
-            itemList.innerHTML = '';
-            items.forEach(item => {
-                const li = document.createElement('li');
-                li.textContent = item;
-                itemList.appendChild(li);
-            });
-        }
+        // Send a new message
+        sendButton.addEventListener('click', async () => {
+            const message = messageInput.value.trim();
+            if (!message) return;
 
-        // Event listener for form submission
-        itemForm.addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const itemInput = document.getElementById('itemInput');
-            const item = itemInput.value.trim();
-
-            // Send the new item to the server
-            const response = await fetch('/.netlify/functions/items', {
+            await fetch('/.netlify/functions/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ item })
+                body: JSON.stringify({ message })
             });
 
-            const data = await response.json();
-            if (data.success) {
-                itemInput.value = '';
-                fetchItems(); // Refresh the item list
-            } else {
-                alert('Item already exists or is invalid.');
-            }
+            messageInput.value = ''; // Clear input
+            fetchMessages(); // Refresh chat
         });
 
-        // Initial fetch to display items
-        fetchItems();
+        // Update chat every second
+        setInterval(fetchMessages, 1000);
+        
+        // Load messages on page load
+        fetchMessages();
     </script>
 </body>
 </html>
