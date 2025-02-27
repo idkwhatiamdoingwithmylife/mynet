@@ -6,11 +6,34 @@
     <title>Simple Item Manager</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
             padding: 20px;
+            color: #333;
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        form {
+            margin-bottom: 20px;
         }
         input[type="text"] {
-            margin-bottom: 10px;
+            padding: 10px;
+            width: calc(100% - 110px);
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
         }
         ul {
             list-style-type: none;
@@ -19,9 +42,13 @@
         li {
             margin: 5px 0;
             padding: 10px;
-            background-color: #f9f9f9;
+            background-color: #fff;
             border: 1px solid #ddd;
             border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        li:hover {
+            background-color: #f0f0f0;
         }
     </style>
 </head>
@@ -38,14 +65,12 @@
         const itemForm = document.getElementById('itemForm');
         const itemList = document.getElementById('itemList');
 
-        // Function to fetch items from the server
         async function fetchItems() {
             const response = await fetch('/.netlify/functions/items');
             const data = await response.json();
             displayItems(data.items);
         }
 
-        // Function to display items
         function displayItems(items) {
             itemList.innerHTML = '';
             items.forEach(item => {
@@ -55,13 +80,11 @@
             });
         }
 
-        // Event listener for form submission
         itemForm.addEventListener('submit', async function(event) {
             event.preventDefault();
             const itemInput = document.getElementById('itemInput');
             const item = itemInput.value.trim();
 
-            // Send the new item to the server
             const response = await fetch('/.netlify/functions/items', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -71,13 +94,12 @@
             const data = await response.json();
             if (data.success) {
                 itemInput.value = '';
-                fetchItems(); // Refresh the item list
+                fetchItems();
             } else {
                 alert('Item already exists or is invalid.');
             }
         });
 
-        // Initial fetch to display items
         fetchItems();
     </script>
 </body>
