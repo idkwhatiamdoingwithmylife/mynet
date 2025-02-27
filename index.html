@@ -10,7 +10,6 @@
             const data = await response.json();
             document.getElementById('computer-info').innerText = `Computer Name: ${data.computerName}, Public IP: ${data.publicIp}`;
         }
-
         window.onload = fetchData;
     </script>
 </head>
