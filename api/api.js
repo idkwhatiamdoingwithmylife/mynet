@@ -6,5 +6,6 @@ export default async (req, res) => {
         computerData.computerName = body.computerName;
         computerData.publicIp = body.publicIp;
     }
+    res.setHeader('Content-Type', 'application/json');
     res.status(200).json(computerData);
 };
