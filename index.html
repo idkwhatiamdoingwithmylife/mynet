@@ -7,65 +7,103 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            padding: 20px;
+            background-color: #121212;
+            color: white;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        h1 {
+            margin-bottom: 10px;
         }
         #chatBox {
-            width: 90%;
+            width: 80%;
             max-width: 600px;
             height: 400px;
-            border: 1px solid #ddd;
             overflow-y: auto;
-            margin-bottom: 10px;
+            border: 1px solid #444;
             padding: 10px;
-            background: #f9f9f9;
+            background: #222;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .message {
+            background: #333;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
         }
         input {
             width: 80%;
+            max-width: 600px;
             padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
         }
         button {
             padding: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .clear-btn {
+            background: red;
         }
     </style>
 </head>
 <body>
     <h1>Live Anonymous Chat</h1>
     <div id="chatBox"></div>
-    <input type="text" id="messageInput" placeholder="Type your message..." maxlength="1000">
-    <button id="sendButton">Send</button>
+    <input type="text" id="chatInput" placeholder="Type a message..." maxlength="1000">
+    <button onclick="sendMessage()">Send</button>
+    <button class="clear-btn" onclick="clearChat()">Clear Chat</button>
 
     <script>
-        const chatBox = document.getElementById('chatBox');
-        const messageInput = document.getElementById('messageInput');
-        const sendButton = document.getElementById('sendButton');
-
         async function fetchMessages() {
-            const response = await fetch('/.netlify/functions/messages');
+            const response = await fetch('/.netlify/functions/items');
             const data = await response.json();
-            chatBox.innerHTML = data.messages.map(msg => `<div>${msg}</div>`).join('');
+            displayMessages(data.items);
+        }
+
+        function displayMessages(messages) {
+            const chatBox = document.getElementById('chatBox');
+            chatBox.innerHTML = '';
+            messages.forEach(msg => {
+                const div = document.createElement('div');
+                div.classList.add('message');
+                div.textContent = msg;
+                chatBox.appendChild(div);
+            });
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         async function sendMessage() {
-            const message = messageInput.value.trim();
-            if (!message) return;
-            await fetch('/.netlify/functions/messages', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message })
-            });
-            messageInput.value = '';
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (message) {
+                await fetch('/.netlify/functions/items', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ item: message })
+                });
+                input.value = '';
+            }
         }
 
-        sendButton.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keypress', event => {
-            if (event.key === 'Enter') sendMessage();
-        });
+        async function clearChat() {
+            await fetch('/.netlify/functions/api', { method: 'DELETE' });
+            fetchMessages();
+        }
 
-        setInterval(fetchMessages, 2000);
+        setInterval(fetchMessages, 1000);
         fetchMessages();
     </script>
 </body>
