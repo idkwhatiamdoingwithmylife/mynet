@@ -1,6 +1,5 @@
 let items = [];
 
-// Function to add an item
 function addItem(item) {
     if (item && !items.includes(item)) {
         items.push(item);
@@ -9,12 +8,10 @@ function addItem(item) {
     return false;
 }
 
-// Function to get all items
 function getItems() {
     return items;
 }
 
-// Event listener for form submission
 document.getElementById('itemForm').addEventListener('submit', function(event) {
     event.preventDefault();
     const itemInput = document.getElementById('itemInput');
@@ -28,7 +25,6 @@ document.getElementById('itemForm').addEventListener('submit', function(event) {
     }
 });
 
-// Function to display items
 function displayItems() {
     const itemList = document.getElementById('itemList');
     itemList.innerHTML = '';
