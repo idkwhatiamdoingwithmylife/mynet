@@ -1,28 +1,41 @@
-let messages = [];
+let items = [];
 
-exports.handler = async (event) => {
-    if (event.httpMethod === 'POST') {
-        const { username, message } = JSON.parse(event.body);
-        if (username && message) {
-            messages.push({ username, message });
-            return {
-                statusCode: 200,
-                body: JSON.stringify({ success: true, messages }),
-            };
-        }
-        return {
-            statusCode: 400,
-            body: JSON.stringify({ success: false }),
-        };
-    } else if (event.httpMethod === 'GET') {
-        return {
-            statusCode: 200,
-            body: JSON.stringify({ messages }),
-        };
+function addItem(item) {
+    if (item && item.length <= 1000) {
+        items.push(item);
+        return true;
     }
+    return false;
+}
 
-    return {
-        statusCode: 405,
-        body: JSON.stringify({ success: false }),
-    };
-};
+function getItems() {
+    return items;
+}
+
+document.getElementById('itemForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const nameInput = document.getElementById('nameInput');
+    const itemInput = document.getElementById('itemInput');
+    const name = nameInput.value.trim() || 'Anonymous';
+    const item = itemInput.value.trim();
+
+    const message = `${name}: ${item}`;
+
+    if (addItem(message)) {
+        itemInput.value = '';
+        displayItems();
+    } else {
+        alert('Message is invalid.');
+    }
+});
+
+function displayItems() {
+    const itemList = document.getElementById('itemList');
+    itemList.innerHTML = '';
+    const itemsToDisplay = getItems();
+    itemsToDisplay.forEach(function(item) {
+        const li = document.createElement('li');
+        li.textContent = item;
+        itemList.appendChild(li);
+    });
+}
