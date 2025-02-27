@@ -75,7 +75,7 @@
 </head>
 <body>
     <div class="container">
-        <button class="back-button" onclick="window.location.href='chat.html'">Back to Chat</button>
+        <button class="back-button" onclick="window.location.href='index.html'">Back to Chat</button>
         <h1 id="formTitle">Login</h1>
         <form id="loginForm">
             <input type="text" id="loginUsername" placeholder="Username" required>
@@ -121,16 +121,16 @@
             event.preventDefault();
             const username = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
-            // Add login logic here
-            alert(`Logging in with username: ${username}`);
+            // Implement login functionality here
+            alert(`Logging in as ${username}`);
         });
 
         signupForm.addEventListener('submit', (event) => {
             event.preventDefault();
             const username = document.getElementById('signupUsername').value;
             const password = document.getElementById('signupPassword').value;
-            // Add signup logic here
-            alert(`Signing up with username: ${username}`);
+            // Implement signup functionality here
+            alert(`Signing up as ${username}`);
         });
     </script>
 </body>
