@@ -1,7 +1,7 @@
 let items = [];
 
 function addItem(item) {
-    if (item && !items.includes(item)) {
+    if (item && !items.includes(item) && item.length <= 1000) {
         items.push(item);
         return true;
     }
@@ -21,7 +21,7 @@ document.getElementById('itemForm').addEventListener('submit', function(event) {
         itemInput.value = '';
         displayItems();
     } else {
-        alert('Item already exists or is invalid.');
+        alert('Message already exists or is invalid.');
     }
 });
 
