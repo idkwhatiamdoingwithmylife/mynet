@@ -3,108 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Anonymous Chat</title>
+    <title>Simple Item Manager</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            padding: 20px;
         }
-        h1 {
+        input[type="text"] {
             margin-bottom: 10px;
         }
-        #chatBox {
-            width: 80%;
-            max-width: 600px;
-            height: 400px;
-            overflow-y: auto;
-            border: 1px solid #444;
-            padding: 10px;
-            background: #222;
-            border-radius: 5px;
-            margin-bottom: 10px;
+        ul {
+            list-style-type: none;
+            padding: 0;
         }
-        .message {
-            background: #333;
-            padding: 10px;
+        li {
             margin: 5px 0;
-            border-radius: 5px;
-        }
-        input {
-            width: 80%;
-            max-width: 600px;
             padding: 10px;
-            margin-bottom: 10px;
-            border: none;
-            border-radius: 5px;
-        }
-        button {
-            padding: 10px;
-            background: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        button:hover {
-            background: #0056b3;
-        }
-        .clear-btn {
-            background: red;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
-    <h1>Live Anonymous Chat</h1>
-    <div id="chatBox"></div>
-    <input type="text" id="chatInput" placeholder="Type a message..." maxlength="1000">
-    <button onclick="sendMessage()">Send</button>
-    <button class="clear-btn" onclick="clearChat()">Clear Chat</button>
+    <h1>Simple Item Manager</h1>
+    <form id="itemForm">
+        <input type="text" id="itemInput" placeholder="Enter an item" required>
+        <button type="submit">Add Item</button>
+    </form>
+    <h2>Items:</h2>
+    <ul id="itemList"></ul>
 
     <script>
-        async function fetchMessages() {
+        const itemForm = document.getElementById('itemForm');
+        const itemList = document.getElementById('itemList');
+
+        // Function to fetch items from the server
+        async function fetchItems() {
             const response = await fetch('/.netlify/functions/items');
             const data = await response.json();
-            displayMessages(data.items);
+            displayItems(data.items);
         }
 
-        function displayMessages(messages) {
-            const chatBox = document.getElementById('chatBox');
-            chatBox.innerHTML = '';
-            messages.forEach(msg => {
-                const div = document.createElement('div');
-                div.classList.add('message');
-                div.textContent = msg;
-                chatBox.appendChild(div);
+        // Function to display items
+        function displayItems(items) {
+            itemList.innerHTML = '';
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                itemList.appendChild(li);
             });
-            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        async function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            if (message) {
-                await fetch('/.netlify/functions/items', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ item: message })
-                });
-                input.value = '';
+        // Event listener for form submission
+        itemForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const itemInput = document.getElementById('itemInput');
+            const item = itemInput.value.trim();
+
+            // Send the new item to the server
+            const response = await fetch('/.netlify/functions/items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ item })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                itemInput.value = '';
+                fetchItems(); // Refresh the item list
+            } else {
+                alert('Item already exists or is invalid.');
             }
-        }
+        });
 
-        async function clearChat() {
-            await fetch('/.netlify/functions/api', { method: 'DELETE' });
-            fetchMessages();
-        }
-
-        setInterval(fetchMessages, 1000);
-        fetchMessages();
+        // Initial fetch to display items
+        fetchItems();
     </script>
 </body>
 </html>
