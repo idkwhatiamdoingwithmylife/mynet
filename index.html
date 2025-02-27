@@ -6,12 +6,25 @@
     <title>Connection Status</title>
     <script>
         async function checkConnection() {
-            const response = await fetch('/api/api.js');
-            const data = await response.json();
-            document.getElementById('status').innerText = data.message;
+            try {
+                const response = await fetch('/api/api.js');
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('status').innerText = data.message;
+                } else {
+                    document.getElementById('status').innerText = 'Error connecting to API';
+                }
+            } catch (error) {
+                document.getElementById('status').innerText = 'Network error';
+            }
         }
 
-        window.onload = checkConnection;
+        function startPolling() {
+            checkConnection();
+            setInterval(checkConnection, 100); // Check every second
+        }
+
+        window.onload = startPolling;
     </script>
 </head>
 <body>
