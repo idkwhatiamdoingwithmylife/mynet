@@ -4,30 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connection Status</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
+    <script>
+        async function fetchIP() {
+            try {
+                const response = await fetch('https://api64.ipify.org?format=json');
+                const data = await response.json();
+                document.getElementById('connection-status').innerText = `Connected to ${data.ip}`;
+            } catch (error) {
+                console.error('Error fetching IP:', error);
+                document.getElementById('connection-status').innerText = 'Error fetching IP';
+            }
         }
-        #status {
-            font-size: 24px;
-            color: green;
-        }
-    </style>
+        
+        window.onload = fetchIP;
+    </script>
 </head>
 <body>
-    <h1>Connection Status</h1>
-    <div id="status"></div>
-
-    <script>
-        async function fetchConnectionStatus() {
-            const response = await fetch('/api');
-            const data = await response.json();
-            document.getElementById('status').innerText = data.message;
-        }
-
-        fetchConnectionStatus();
-    </script>
+    <h1 id="connection-status">Connecting...</h1>
 </body>
 </html>
