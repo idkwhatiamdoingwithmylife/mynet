@@ -5,7 +5,8 @@ app.use(express.json());
 
 let latestMessage = "";
 
-app.post("/api/api.js", (req, res) => {
+// Endpoint to handle incoming messages
+app.post("/api/message", (req, res) => {
     const { message } = req.body;
     if (!message) return res.status(400).json({ error: "No message provided" });
 
@@ -13,8 +14,10 @@ app.post("/api/api.js", (req, res) => {
     res.json({ success: true });
 });
 
-app.get("/api/api.js", (req, res) => {
+// Endpoint to fetch the latest message
+app.get("/api/message", (req, res) => {
     res.json({ message: latestMessage, connected: true });
 });
 
-app.listen(3000, () => console.log("API running on port 3000"));
+// Export the app for serverless deployment
+export default app;
