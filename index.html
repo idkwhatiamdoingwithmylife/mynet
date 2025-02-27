@@ -4,10 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IP Connection</title>
-    <script src="/api/api.js"></script>
+    <script>
+        async function fetchIP() {
+            const response = await fetch('/api');
+            const data = await response.json();
+            document.getElementById('message').innerText = data.message || 'No IP connected';
+        }
+
+        window.onload = fetchIP;
+    </script>
 </head>
 <body>
     <h1>IP Connection Test</h1>
-    <div id="message"></div>
+    <div id="message">Loading...</div>
 </body>
 </html>
