@@ -25,14 +25,11 @@
         async function fetchMessages() {
             try {
                 const response = await fetch('/.netlify/functions/chat');
-                if (!response.ok) {
-                    throw new Error(`Error fetching messages: ${response.statusText}`);
-                }
                 const data = await response.json();
                 chatBox.innerHTML = data.messages.map(msg => `<p>${msg}</p>`).join('');
                 chatBox.scrollTop = chatBox.scrollHeight;
             } catch (error) {
-                console.error(error);
+                console.error('Failed to fetch messages:', error);
             }
         }
 
@@ -46,18 +43,19 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ message })
                 });
-                if (!response.ok) {
-                    throw new Error(`Error sending message: ${response.statusText}`);
+                if (response.ok) {
+                    messageInput.value = "";
+                    fetchMessages(); // Update messages after sending
+                } else {
+                    console.error('Error sending message');
                 }
-                messageInput.value = "";
-                fetchMessages();
             } catch (error) {
-                console.error(error);
+                console.error('Failed to send message:', error);
             }
         });
 
-        setInterval(fetchMessages, 1000);
-        fetchMessages();
+        setInterval(fetchMessages, 1000); // Fetch new messages every second
+        fetchMessages(); // Initial fetch
     </script>
 </body>
 </html>
