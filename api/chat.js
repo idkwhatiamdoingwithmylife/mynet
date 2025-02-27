@@ -15,8 +15,13 @@ exports.handler = async (event) => {
             body: JSON.stringify({ success: false }),
         };
     } else if (event.httpMethod === 'GET') {
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ items }),
+        };
+    } else if (event.httpMethod === 'DELETE') {
         const index = event.queryStringParameters?.index;
-        if (index !== undefined) {
+        if (index !== undefined && index >= 0 && index < items.length) {
             items.splice(index, 1);
             return {
                 statusCode: 200,
@@ -24,8 +29,8 @@ exports.handler = async (event) => {
             };
         }
         return {
-            statusCode: 200,
-            body: JSON.stringify({ items }),
+            statusCode: 400,
+            body: JSON.stringify({ success: false }),
         };
     }
     return {
