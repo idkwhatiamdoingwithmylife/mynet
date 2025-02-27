@@ -20,7 +20,6 @@ exports.handler = async (event) => {
             body: JSON.stringify({ items }),
         };
     }
-
     return {
         statusCode: 405,
         body: JSON.stringify({ success: false }),
