@@ -3,18 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Item Manager</title>
+    <title>Live Anonymous Chat</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        #chatContainer {
+            max-width: 600px;
+            margin: auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 20px;
         }
-        input[type="text"] {
+        #messageInput {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
             margin-bottom: 10px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #4cae4c;
         }
         ul {
             list-style-type: none;
             padding: 0;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 10px;
         }
         li {
             margin: 5px 0;
@@ -26,56 +59,43 @@
     </style>
 </head>
 <body>
-    <h1>Simple Item Manager</h1>
-    <form id="itemForm">
-        <input type="text" id="itemInput" placeholder="Enter an item" required>
-        <button type="submit">Add Item</button>
-    </form>
-    <h2>Items:</h2>
-    <ul id="itemList"></ul>
+    <div id="chatContainer">
+        <h1>Live Anonymous Chat</h1>
+        <input type="text" id="messageInput" placeholder="Type your message (max 100 characters)" maxlength="100" required>
+        <button id="sendButton">Send</button>
+        <h2>Messages:</h2>
+        <ul id="messageList"></ul>
+    </div>
 
     <script>
-        const itemForm = document.getElementById('itemForm');
-        const itemList = document.getElementById('itemList');
+        const messageInput = document.getElementById('messageInput');
+        const messageList = document.getElementById('messageList');
+        const sendButton = document.getElementById('sendButton');
 
-        // Function to fetch items from the server
-        async function fetchItems() {
-            const response = await fetch('/.netlify/functions/items');
-            const data = await response.json();
-            displayItems(data.items);
+        // Initialize WebSocket connection
+        const socket = new WebSocket('wss://your-websocket-endpoint');
+
+        // Function to display messages in the list
+        function displayMessage(message) {
+            const li = document.createElement('li');
+            li.textContent = message;
+            messageList.appendChild(li);
+            messageList.scrollTop = messageList.scrollHeight; // Scroll to bottom
         }
 
-        function displayItems(items) {
-            itemList.innerHTML = '';
-            items.forEach(item => {
-                const li = document.createElement('li');
-                li.textContent = item;
-                itemList.appendChild(li);
-            });
-        }
-
-        itemForm.addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const itemInput = document.getElementById('itemInput');
-            const item = itemInput.value.trim();
-
-            const response = await fetch('/.netlify/functions/items', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ item })
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                itemInput.value = '';
-                fetchItems();
-            } else {
-                alert('Item already exists or is invalid.');
-            }
+        // WebSocket event listeners
+        socket.addEventListener('message', (event) => {
+            displayMessage(event.data); // Display incoming messages
         });
 
-        // Initial fetch to display items
-        fetchItems();
+        // Event listener for button click
+        sendButton.addEventListener('click', () => {
+            const message = messageInput.value.trim();
+            if (message) {
+                socket.send(message); // Send message through WebSocket
+                messageInput.value = ''; // Clear input
+            }
+        });
     </script>
 </body>
 </html>
