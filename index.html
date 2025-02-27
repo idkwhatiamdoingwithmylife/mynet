@@ -23,24 +23,37 @@
         const sendBtn = document.getElementById("sendBtn");
 
         async function fetchMessages() {
-            const response = await fetch('/.netlify/functions/chat');
-            const data = await response.json();
-            chatBox.innerHTML = data.messages.map(msg => `<p>${msg}</p>`).join('');
-            chatBox.scrollTop = chatBox.scrollHeight;
+            try {
+                const response = await fetch('/.netlify/functions/chat');
+                if (!response.ok) {
+                    throw new Error(`Error fetching messages: ${response.statusText}`);
+                }
+                const data = await response.json();
+                chatBox.innerHTML = data.messages.map(msg => `<p>${msg}</p>`).join('');
+                chatBox.scrollTop = chatBox.scrollHeight;
+            } catch (error) {
+                console.error(error);
+            }
         }
 
         sendBtn.addEventListener("click", async () => {
             const message = messageInput.value.trim();
             if (message.length === 0 || message.length > 1000) return;
-            
-            await fetch('/.netlify/functions/chat', {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message })
-            });
 
-            messageInput.value = "";
-            fetchMessages();
+            try {
+                const response = await fetch('/.netlify/functions/chat', {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message })
+                });
+                if (!response.ok) {
+                    throw new Error(`Error sending message: ${response.statusText}`);
+                }
+                messageInput.value = "";
+                fetchMessages();
+            } catch (error) {
+                console.error(error);
+            }
         });
 
         setInterval(fetchMessages, 1000);
