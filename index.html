@@ -3,18 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Computer Info</title>
-    <script>
-        async function fetchData() {
-            const response = await fetch('/api/api.js');
-            const data = await response.json();
-            document.getElementById('computer-info').innerText = `Computer Name: ${data.computerName}, Public IP: ${data.publicIp}`;
-        }
-        window.onload = fetchData;
-    </script>
+    <title>Your App</title>
 </head>
 <body>
-    <h1>Computer Information</h1>
-    <div id="computer-info">Loading...</div>
+    <div id="message">Connecting...</div>
+    
+    <script>
+        async function connectToApi() {
+            const response = await fetch('/api/api.js', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const data = await response.json();
+            document.getElementById('message').innerText = data.message;
+        }
+
+        connectToApi();
+    </script>
 </body>
 </html>
