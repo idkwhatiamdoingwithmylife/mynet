@@ -1,13 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API Example</title>
-    <script src="api/api.js" defer></script>
-</head>
-<body>
-    <h1>Message from Python:</h1>
-    <div id="message">Waiting for message...</div>
-</body>
-</html>
+async function loadMessages() {
+    const response = await fetch('/.netlify/functions/messages');
+    const messages = await response.json();
+    chatBox.innerHTML = '';
+    messages.forEach(msg => {
+        const messageElement = document.createElement('div');
+        messageElement.textContent = `${msg.username}: ${msg.message}`;
+        chatBox.appendChild(messageElement);
+    });
+    chatBox.scrollTop = chatBox.scrollHeight; // Scroll to bottom
+}
+
+async function sendMessage() {
+    const message = chatInput.value.trim();
+    if (message) {
+        await fetch('/.netlify/functions/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, message })
+        });
+        chatInput.value = '';
+        loadMessages(); // Load messages again to see the new one
+    }
+}
