@@ -1,36 +1,41 @@
-const messageContainer = document.getElementById('messageContainer');
-const messageInput = document.getElementById('messageInput');
-const usernameInput = document.getElementById('usernameInput');
+let messages = [];
 
-async function fetchMessages() {
-    const response = await fetch('/.netlify/functions/chat');
-    const data = await response.json();
-    data.messages.forEach(msg => displayMessage(msg.username, msg.message));
+function addMessage(username, message) {
+    if (username && message) {
+        messages.push({ username, message });
+        return true;
+    }
+    return false;
 }
 
-async function sendMessage() {
+function getMessages() {
+    return messages;
+}
+
+document.getElementById('sendButton').addEventListener('click', function() {
+    const usernameInput = document.getElementById('usernameInput');
+    const messageInput = document.getElementById('messageInput');
     const username = usernameInput.value.trim();
     const message = messageInput.value.trim();
+
     if (username && message) {
-        await fetch('/.netlify/functions/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, message }),
-        });
-        displayMessage(username, message);
-        messageInput.value = '';
+        addMessage(username, message);
+        messageInput.value = ''; // Clear input
+        updateChat();
     } else {
-        alert('Both username and message are required!');
+        alert('Username and message cannot be empty or just spaces.');
     }
-}
+});
 
-function displayMessage(username, message) {
-    const div = document.createElement('div');
-    div.classList.add('message');
-    div.textContent = `${username}: ${message}`;
-    messageContainer.appendChild(div);
-    messageContainer.scrollTop = messageContainer.scrollHeight;
+function updateChat() {
+    const chatContainer = document.getElementById('chatContainer');
+    chatContainer.innerHTML = ''; // Clear previous messages
+    const allMessages = getMessages();
+    allMessages.forEach(msg => {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message');
+        messageElement.innerHTML = `<span class="username">${msg.username}:</span> ${msg.message}`;
+        chatContainer.appendChild(messageElement);
+    });
+    chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll to bottom
 }
-
-document.getElementById('sendMessage').addEventListener('click', sendMessage);
-fetchMessages();
