@@ -1,26 +1,155 @@
-async function loadMessages() {
-    const response = await fetch('/.netlify/functions/messages');
-    const messages = await response.json();
-    chatBox.innerHTML = '';
-    messages.forEach(msg => {
-        const messageElement = document.createElement('div');
-        messageElement.textContent = `${msg.username}: ${msg.message}`;
-        chatBox.appendChild(messageElement);
-    });
-    chatBox.scrollTop = chatBox.scrollHeight; // Scroll to bottom
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        .chat-box {
+            border: 1px solid #ddd;
+            height: 300px;
+            overflow-y: scroll;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .chat-input {
+            width: calc(100% - 50px);
+            padding: 10px;
+            margin-right: 10px;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
 
-async function sendMessage() {
-    const message = chatInput.value.trim();
-    if (message) {
-        await fetch('/.netlify/functions/messages', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, message })
-        });
-        chatInput.value = '';
-        loadMessages(); // Load messages again to see the new one
+<div class="container">
+    <h1>Chat Room</h1>
+    <div id="chatContainer" class="hidden">
+        <div id="chatBox" class="chat-box"></div>
+        <input type="text" id="chatInput" class="chat-input" placeholder="Type a message...">
+        <button id="sendButton" class="btn">Send</button>
+    </div>
+    <div id="authContainer">
+        <input type="text" id="username" placeholder="Enter username">
+        <button id="loginButton" class="btn">Login</button>
+        <button id="logoutButton" class="btn hidden">Logout</button>
+    </div>
+</div>
+
+<script>
+    const chatContainer = document.getElementById('chatContainer');
+    const authContainer = document.getElementById('authContainer');
+    const chatBox = document.getElementById('chatBox');
+    const chatInput = document.getElementById('chatInput');
+    const sendButton = document.getElementById('sendButton');
+    const loginButton = document.getElementById('loginButton');
+    const logoutButton = document.getElementById('logoutButton');
+    const usernameInput = document.getElementById('username');
+
+    let username = localStorage.getItem('username');
+    
+    if (username) {
+        login(username);
     }
-}
+
+    loginButton.addEventListener('click', async () => {
+        const user = usernameInput.value.trim();
+        const password = prompt("Enter your password:");
+
+        if (user && password) {
+            const response = await fetch('/.netlify/functions/users/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user, password })
+            });
+
+            if (response.ok) {
+                localStorage.setItem('username', user);
+                login(user);
+            } else {
+                alert('Invalid username or password.');
+            }
+        }
+    });
+
+    logoutButton.addEventListener('click', () => {
+        localStorage.removeItem('username');
+        location.reload();
+    });
+
+    sendButton.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    function login(user) {
+        username = user;
+        chatContainer.classList.remove('hidden');
+        authContainer.classList.add('hidden');
+        loadMessages();
+    }
+
+    async function sendMessage() {
+        const message = chatInput.value.trim();
+        if (message) {
+            await fetch('/.netlify/functions/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, message })
+            });
+            chatInput.value = '';
+            loadMessages();
+        }
+    }
+
+    async function loadMessages() {
+        const response = await fetch('/.netlify/functions/messages');
+        const messages = await response.json();
+        chatBox.innerHTML = '';
+        messages.forEach(msg => {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = `${msg.username}: ${msg.message}`;
+            chatBox.appendChild(messageElement);
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    logoutButton.classList.remove('hidden');
+</script>
+</body>
+</html>
