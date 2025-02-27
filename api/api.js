@@ -1,11 +1,21 @@
-let computerData = { computerName: '', publicIp: '' };
+const express = require('express');
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-export default async (req, res) => {
-    if (req.method === 'POST') {
-        const body = await req.json();
-        computerData.computerName = body.computerName;
-        computerData.publicIp = body.publicIp;
-    }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(200).json(computerData);
-};
+app.use(express.json());
+
+let connectionStatus = { message: "Computer disconnected" };
+
+app.post('/api/connect', (req, res) => {
+    const { computer_name, public_ip } = req.body;
+    connectionStatus = { message: `Hi, ${computer_name} connected! Your IP is ${public_ip}` };
+    res.json(connectionStatus);
+});
+
+app.get('/api/status', (req, res) => {
+    res.json(connectionStatus);
+});
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
