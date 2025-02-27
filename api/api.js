@@ -1,7 +1,7 @@
 let items = [];
 
 function addItem(item) {
-    if (item && !items.includes(item) && item.length <= 1000) {
+    if (item && item.length <= 1000) {
         items.push(item);
         return true;
     }
@@ -14,14 +14,18 @@ function getItems() {
 
 document.getElementById('itemForm').addEventListener('submit', function(event) {
     event.preventDefault();
+    const nameInput = document.getElementById('nameInput');
     const itemInput = document.getElementById('itemInput');
+    const name = nameInput.value.trim() || 'Anonymous';
     const item = itemInput.value.trim();
 
-    if (addItem(item)) {
+    const message = `${name}: ${item}`;
+
+    if (addItem(message)) {
         itemInput.value = '';
         displayItems();
     } else {
-        alert('Message already exists or is invalid.');
+        alert('Message is invalid.');
     }
 });
 
