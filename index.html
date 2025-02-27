@@ -14,7 +14,7 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ computerName: 'YourComputerName' }),
+                body: JSON.stringify({ computerName: 'YourComputerName' }), // Placeholder
             });
             const data = await response.json();
             document.getElementById('message').textContent = data.message;
@@ -24,4 +24,3 @@
     </script>
 </body>
 </html>
-
