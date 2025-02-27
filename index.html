@@ -3,20 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connected Devices</title>
+    <title>Connected Device</title>
     <script src="api/api.js"></script>
 </head>
 <body>
-    <h1>Connected Devices</h1>
-    <div id="device-status"></div>
+    <h1 id="status">Connecting...</h1>
     <script>
-        async function updateDeviceStatus() {
-            const response = await fetch('https://funny-marigold-5eed7d.netlify.app/api/api.js');
-            const data = await response.json();
-            document.getElementById('device-status').innerText = `Connected to: ${data.deviceName}`;
-        }
-
-        updateDeviceStatus();
+        connectToAPI();
     </script>
 </body>
 </html>
