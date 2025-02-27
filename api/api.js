@@ -7,14 +7,14 @@ app.use(express.json());
 
 let connectedComputer = 'Not connected';
 
-app.get('/api', (req, res) => {
+app.post('/api', (req, res) => {
+    connectedComputer = req.body.computerName || 'Unknown';
     res.json({ message: `connected to ${connectedComputer}` });
 });
 
-// Endpoint to set the connected computer name (add this)
-app.post('/api/connect', (req, res) => {
-    connectedComputer = req.body.computerName || 'Unknown';
-    res.json({ message: `Computer name updated to ${connectedComputer}` });
+// Endpoint to retrieve the connected computer name
+app.get('/api/name', (req, res) => {
+    res.json({ message: `connected to ${connectedComputer}` });
 });
 
 const PORT = process.env.PORT || 5000;
