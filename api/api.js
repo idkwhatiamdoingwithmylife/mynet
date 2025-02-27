@@ -1,21 +1,14 @@
 module.exports = async (req, res) => {
-  const encodedMessage = req.query.message;
+  const message = req.query.message;
 
-  if (encodedMessage) {
-    try {
-      const decodedMessage = atob(encodedMessage);
-      const messageParts = decodedMessage.split(": ");
+  if (message) {
+    if (message.startsWith('Visited:')) {
+      const fullUrl = message.split(": ")[1];
       
-      if (decodedMessage.includes('Visited:')) {
-        const fullUrl = messageParts[1];
-        
-        // Respond with the connected IP address
-        res.status(200).json({ message: `Connected to ${fullUrl}` });
-      } else {
-        res.status(400).json({ error: 'Invalid message format' });
-      }
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to decode Base64 message' });
+      // Respond with the connected IP address
+      res.status(200).json({ message: `Connected to ${fullUrl}` });
+    } else {
+      res.status(400).json({ error: 'Invalid message format' });
     }
   } else {
     res.status(400).json({ error: 'No message provided' });
