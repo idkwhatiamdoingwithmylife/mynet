@@ -8,13 +8,14 @@
 <body>
     <input type="text" id="message" placeholder="Type your message">
     <button onclick="sendMessage()">Send</button>
+    <div id="status"></div>
 
     <script>
         async function sendMessage() {
             const message = document.getElementById("message").value;
             if (!message) return alert("Please enter a message.");
 
-            const response = await fetch("https://net-eosin.vercel.app/api/api.js", {
+            const response = await fetch("https://funny-marigold-5eed7d.netlify.app/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -28,6 +29,20 @@
                 alert("Failed to send message.");
             }
         }
+
+        async function checkConnection() {
+            const response = await fetch("https://funny-marigold-5eed7d.netlify.app/status");
+            const statusDiv = document.getElementById("status");
+            if (response.ok) {
+                const data = await response.json();
+                statusDiv.innerText = data.connected ? "Computer is connected." : "Computer is not connected.";
+            } else {
+                statusDiv.innerText = "Failed to check connection.";
+            }
+        }
+
+        // Check connection on page load
+        window.onload = checkConnection;
     </script>
 </body>
 </html>
