@@ -3,7 +3,7 @@ let messages = [];
 exports.handler = async (event) => {
     if (event.httpMethod === 'POST') {
         const { username, message } = JSON.parse(event.body);
-        if (username.trim() && message.trim() && message.length <= 1000) {
+        if (username && message) {
             messages.push({ username, message });
             return {
                 statusCode: 200,
