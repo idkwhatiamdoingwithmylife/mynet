@@ -1,19 +1,18 @@
-const axios = require('axios');
+let connectedIP = 'No IP connected';
 
 exports.handler = async (event, context) => {
-    try {
-        // Get public IP using an external service
-        const response = await axios.get('https://api.ipify.org?format=json');
-        const publicIP = response.data.ip;
-
+    if (event.httpMethod === 'POST') {
+        const body = JSON.parse(event.body);
+        connectedIP = body.ip; // Store the IP sent from Python script
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: `Connected to ${publicIP}` }),
+            body: JSON.stringify({ message: `IP updated to ${connectedIP}` }),
         };
-    } catch (error) {
+    } else {
+        // GET request
         return {
-            statusCode: 500,
-            body: JSON.stringify({ error: 'Unable to fetch public IP' }),
+            statusCode: 200,
+            body: JSON.stringify({ message: `Connected to ${connectedIP}` }),
         };
     }
 };
