@@ -3,50 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connection Status</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-            margin: 0;
-        }
-        .container {
-            text-align: center;
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .message {
-            font-size: 1.5rem;
-            margin-top: 20px;
-        }
-    </style>
+    <title>Computer Connection</title>
 </head>
 <body>
-    <div class="container">
-        <h1>Connection Status</h1>
-        <div class="message" id="status-message">Not connected</div>
-    </div>
-
+    <h1 id="message">Not connected</h1>
     <script>
-        async function checkConnection() {
-            const response = await fetch('/api/api.js', {
+        async function fetchComputerName() {
+            const response = await fetch('/.netlify/functions/api', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({})
+                body: JSON.stringify({ computerName: 'YourComputerName' }),
             });
             const data = await response.json();
-            document.getElementById('status-message').innerText = data.message;
+            document.getElementById('message').textContent = data.message;
         }
 
-        checkConnection();
+        fetchComputerName();
     </script>
 </body>
 </html>
+
