@@ -104,24 +104,24 @@
         toggleSignup.addEventListener('click', () => {
             loginForm.style.display = 'none';
             signupForm.style.display = 'block';
-            signupToggle.style.display = 'none'; // Hide the "Don't have an account?" link
+            signupToggle.style.display = 'none';
             toggleLogin.style.display = 'block';
-            formTitle.style.display = 'none'; // Hide the login title
+            formTitle.style.display = 'none';
         });
 
         toggleLogin.addEventListener('click', () => {
             signupForm.style.display = 'none';
             loginForm.style.display = 'block';
             toggleLogin.style.display = 'none';
-            signupToggle.style.display = 'block'; // Show the "Don't have an account?" link
-            formTitle.style.display = 'block'; // Show the login title
+            signupToggle.style.display = 'block';
+            formTitle.style.display = 'block';
         });
 
         loginForm.addEventListener('submit', (event) => {
             event.preventDefault();
             const username = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
-            // Add your login logic here
+            // Add login logic here
             alert(`Logging in with username: ${username}`);
         });
 
@@ -129,7 +129,7 @@
             event.preventDefault();
             const username = document.getElementById('signupUsername').value;
             const password = document.getElementById('signupPassword').value;
-            // Add your signup logic here
+            // Add signup logic here
             alert(`Signing up with username: ${username}`);
         });
     </script>
