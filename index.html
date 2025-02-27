@@ -3,19 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Computer Name Display</title>
-    <script>
-        async function fetchComputerName() {
-            const response = await fetch('/api/computer-name');
-            const data = await response.json();
-            document.getElementById('computer-name').innerText = data.name;
-        }
-
-        setInterval(fetchComputerName, 100); // Update every 0.1 seconds
-    </script>
+    <title>WebSocket Server</title>
+    <script src="api.js" defer></script>
 </head>
 <body>
-    <h1>Connected Computer Name:</h1>
-    <p id="computer-name">Loading...</p>
+    <h1>WebSocket Server</h1>
+    <div id="messages"></div>
 </body>
 </html>
