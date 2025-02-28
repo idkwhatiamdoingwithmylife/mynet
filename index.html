@@ -58,6 +58,15 @@
             border: 1px solid #ccc;
             font-size: 16px;
         }
+        #messageContainer {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        #messageContainer input[type="text"] {
+            flex-grow: 1;
+        }
     </style>
 </head>
 <body>
@@ -67,28 +76,16 @@
         <button onclick="window.location.href='login.html'">Login</button>
     </div>
 
+    <div id="accountSection" style="display: none;">
+        <div id="messageContainer">
+            <input type="text" id="messageInput" placeholder="Type your message..." />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
     <div id="chat">
         <h2>Messages:</h2>
         <ul id="messages"></ul>
-    </div>
-
-    <div id="accountSection" style="display: none;">
-        <label for="messageInput">Type your message:</label>
-        <input type="text" id="messageInput" placeholder="Type your message..." />
-        <button onclick="sendMessage()">Send</button>
-    </div>
-
-    <div id="accountSection" style="display: block;">
-        <label for="username">Choose Username (Min 5 characters):</label>
-        <input type="text" id="username" placeholder="Enter a username..." />
-
-        <label for="password">Choose Password (Min 4 characters):</label>
-        <input type="password" id="password" placeholder="Enter a password..." />
-
-        <label for="accountColor">Choose Text Color:</label>
-        <input type="color" id="accountColor" value="#000000" />
-
-        <button onclick="saveAccount()">Save Account</button>
     </div>
 
     <script>
