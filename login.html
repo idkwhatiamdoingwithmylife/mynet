@@ -1,4 +1,4 @@
-.<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,74 +8,64 @@
         body {
             font-family: 'Arial', sans-serif;
             background: linear-gradient(to bottom right, #4CAF50, #81C784);
-            margin: 0;
-            padding: 0;
-            color: #fff;
+            color: white;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            margin: 0;
         }
         .container {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
             padding: 30px;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
-            width: 300px;
-            text-align: center;
-            position: relative;
+            border-radius: 10px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
         }
         h1 {
-            font-size: 2em;
-            margin-bottom: 20px;
+            text-align: center;
         }
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 10px;
+        input {
+            display: block;
             margin: 10px 0;
-            border: none;
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
+            padding: 10px;
+            width: 100%;
+            font-size: 1em;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            outline: none;
         }
         button {
+            display: block;
+            width: 100%;
             padding: 10px;
-            border: none;
-            border-radius: 4px;
             background-color: #4CAF50;
             color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
             cursor: pointer;
-            transition: background-color 0.3s;
-            width: 100%;
+            margin-top: 20px;
         }
         button:hover {
             background-color: #45a049;
         }
         .toggle {
+            text-align: center;
             margin-top: 20px;
-            color: #fff;
-            cursor: pointer;
         }
         .back-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 5px 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .back-button:hover {
-            background-color: #45a049;
+            background-color: #000;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <button class="back-button" onclick="window.location.href='https://my-webiste10.netlify.app'">Back to Chat</button>
+        <button class="back-button" onclick="window.location.href='index.html'">Back to Chat</button>
         <h1 id="formTitle">Login</h1>
         <form id="loginForm">
             <input type="text" id="loginUsername" placeholder="Username" required>
@@ -98,39 +88,40 @@
         const signupForm = document.getElementById('signupForm');
         const toggleSignup = document.getElementById('toggleSignup');
         const toggleLogin = document.getElementById('toggleLogin');
-        const signupToggle = document.getElementById('signupToggle');
         const formTitle = document.getElementById('formTitle');
+        const loginTitle = document.getElementById('loginTitle');
+        const signupTitle = document.getElementById('signupTitle');
 
-        toggleSignup.addEventListener('click', () => {
+        toggleSignup.addEventListener('click', function() {
             loginForm.style.display = 'none';
             signupForm.style.display = 'block';
-            signupToggle.style.display = 'none'; // Hide the "Don't have an account?" link
+            toggleSignup.style.display = 'none';
             toggleLogin.style.display = 'block';
-            formTitle.style.display = 'none'; // Hide the login title
+            formTitle.textContent = 'Sign Up';
         });
 
-        toggleLogin.addEventListener('click', () => {
+        toggleLogin.addEventListener('click', function() {
             signupForm.style.display = 'none';
             loginForm.style.display = 'block';
+            toggleSignup.style.display = 'block';
             toggleLogin.style.display = 'none';
-            signupToggle.style.display = 'block'; // Show the "Don't have an account?" link
-            formTitle.style.display = 'block'; // Show the login title
+            formTitle.textContent = 'Login';
         });
 
-        loginForm.addEventListener('submit', (event) => {
+        loginForm.addEventListener('submit', function(event) {
             event.preventDefault();
             const username = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
-            // Add your login logic here
-            alert(`Logging in with username: ${username}`);
+            // Handle login logic (e.g., check credentials, create session, etc.)
+            alert('Logged in successfully!');
         });
 
-        signupForm.addEventListener('submit', (event) => {
+        signupForm.addEventListener('submit', function(event) {
             event.preventDefault();
             const username = document.getElementById('signupUsername').value;
             const password = document.getElementById('signupPassword').value;
-            // Add your signup logic here
-            alert(`Signing up with username: ${username}`);
+            // Handle signup logic (e.g., create new user in the database, etc.)
+            alert('Account created successfully!');
         });
     </script>
 </body>
