@@ -1,47 +1,39 @@
-const accounts = {};  // Store accounts in memory
+const users = [];
 
-exports.handler = async (event, context) => {
-    const { action, username, password } = JSON.parse(event.body || '{}');
-
-    switch(action) {
-        case 'createAccount':
-            if (accounts[username]) {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({ success: false, message: 'Username already taken.' })
-                };
-            }
-
-            if (username.length < 5 || password.length < 4) {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({ success: false, message: 'Username or password is too short.' })
-                };
-            }
-
-            accounts[username] = { password, color: '#000000' };  // Default color
-            return {
-                statusCode: 200,
-                body: JSON.stringify({ success: true })
-            };
-
-        case 'login':
-            if (!accounts[username] || accounts[username].password !== password) {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({ success: false, message: 'Invalid username or password.' })
-                };
-            }
-
-            return {
-                statusCode: 200,
-                body: JSON.stringify({ success: true, username, color: accounts[username].color })
-            };
-
-        default:
+exports.handler = async function(event, context) {
+    const { action, username, password } = JSON.parse(event.body);
+    
+    if (action === 'createAccount') {
+        const existingUser = users.find(user => user.username === username);
+        if (existingUser) {
             return {
                 statusCode: 400,
-                body: JSON.stringify({ success: false, message: 'Invalid action.' })
+                body: JSON.stringify({ success: false, message: 'Username already taken' })
             };
+        }
+        users.push({ username, password });
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ success: true })
+        };
     }
+
+    if (action === 'login') {
+        const user = users.find(user => user.username === username && user.password === password);
+        if (!user) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ success: false, message: 'Invalid credentials' })
+            };
+        }
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ success: true, user })
+        };
+    }
+
+    return {
+        statusCode: 400,
+        body: JSON.stringify({ success: false, message: 'Invalid action' })
+    };
 };
