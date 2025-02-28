@@ -1,77 +1,45 @@
-let users = {};
+// api.js (Netlify Function)
+
+// Simulating in-memory storage for users and messages (note: data will be lost on server reset)
+let users = [];
 let messages = [];
 
-const generateGuestUsername = () => {
-    const randomNum = Math.floor(Math.random() * 10000);
-    return `guest${randomNum}`;
-};
-
-const isUsernameTaken = (username) => {
-    return Object.hasOwnProperty.call(users, username);
-};
-
-const addMessage = (username, message, color) => {
-    const messageObj = { username, message, color };
-    messages.push(messageObj);
-};
-
 exports.handler = async (event, context) => {
-    if (event.httpMethod === 'POST') {
-        const requestBody = JSON.parse(event.body);
-        const { action, username, password, color, message } = requestBody;
+  const { action } = JSON.parse(event.body || '{}');
+  const response = {
+    statusCode: 200,
+    body: JSON.stringify({ success: true, list: messages }),
+  };
 
-        if (action === 'createAccount') {
-            if (username.length < 5) {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({ success: false, message: 'Username must be at least 5 characters long.' }),
-                };
-            }
+  // Handle creating a new account (username and password)
+  if (action === 'createAccount') {
+    const { username, password, color } = JSON.parse(event.body);
 
-            if (password.length < 4) {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({ success: false, message: 'Password must be at least 4 characters long.' }),
-                };
-            }
-
-            if (isUsernameTaken(username)) {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({ success: false, message: 'Username already taken.' }),
-                };
-            }
-
-            users[username] = { password, color };
-
-            return {
-                statusCode: 200,
-                body: JSON.stringify({ success: true }),
-            };
-        }
-
-        if (action === 'sendMessage') {
-            const actualUsername = username || generateGuestUsername();
-
-            if (!message || message.trim().length === 0) {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({ success: false, message: 'Message cannot be empty.' }),
-                };
-            }
-
-            addMessage(actualUsername, message, color);
-
-            return {
-                statusCode: 200,
-                body: JSON.stringify({ success: true, list: messages }),
-            };
-        }
-    } else {
-        // Default response for GET requests
-        return {
-            statusCode: 200,
-            body: JSON.stringify({ list: messages }),
-        };
+    // Check if the username already exists
+    const existingUser = users.find(user => user.username === username);
+    if (existingUser) {
+      response.statusCode = 400;
+      response.body = JSON.stringify({ success: false, message: 'Username already exists' });
+      return response;
     }
+
+    // Add the new user to the in-memory array
+    users.push({ username, password, color });
+    return response;
+  }
+
+  // Handle sending a message
+  if (action === 'sendMessage') {
+    const { username, message, color } = JSON.parse(event.body);
+
+    // Store the message
+    messages.push({ username, message, color });
+
+    return response;
+  }
+
+  // Default response if no action matches
+  response.statusCode = 400;
+  response.body = JSON.stringify({ success: false, message: 'Invalid action' });
+  return response;
 };
