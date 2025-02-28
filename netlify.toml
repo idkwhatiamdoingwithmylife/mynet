@@ -1,2 +1,6 @@
 [build]
   functions = "api"
+  publish = "public"
+
+[[plugins]]
+  package = "@netlify/plugin-functions-core"
