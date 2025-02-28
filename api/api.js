@@ -1,6 +1,6 @@
 let list = [];  // In-memory list to store the data (note: this resets every time the server restarts)
 
-module.exports.handler = async function(event, context) {
+exports.handler = async function(event, context) {
     if (event.httpMethod === 'POST') {
         const body = JSON.parse(event.body);
 
