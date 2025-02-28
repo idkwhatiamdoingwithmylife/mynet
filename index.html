@@ -6,160 +6,120 @@
     <title>Anonymous Live Chat</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(to bottom right, #4CAF50, #81C784);
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #4a90e2, #50bda1);
             margin: 0;
             padding: 0;
-            color: #fff;
             display: flex;
             flex-direction: column;
             height: 100vh;
         }
-        h1 {
-            font-size: 2.5em;
-            margin: 20px;
-            text-align: center;
-        }
-        .link {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: rgba(255, 255, 255, 0.2);
+        .header {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
             padding: 10px;
-            border-radius: 5px;
+            text-align: center;
+            font-size: 20px;
+            position: relative;
+        }
+        .login-link {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            color: white;
             text-decoration: none;
-            color: #fff;
-            font-size: 1em;
+            font-size: 14px;
         }
         .chat-container {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            flex: 1;
-            overflow: hidden;
-        }
-        ul {
-            list-style-type: none;
-            padding: 10px;
-            margin: 0;
             overflow-y: auto;
-            flex: 1;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
-        }
-        li {
-            margin: 5px 0;
             padding: 10px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            font-size: 0.9em;
-            border-left: 5px solid #4CAF50;
-            transition: background-color 0.3s;
         }
-        li:hover {
-            background-color: rgba(255, 255, 255, 0.3);
+        .message {
+            background: white;
+            padding: 8px;
+            border-radius: 5px;
+            margin: 5px 0;
+            max-width: 70%;
+            word-wrap: break-word;
+            font-size: 14px;
         }
         .input-container {
             display: flex;
             padding: 10px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-top: 1px solid #ddd;
+            background: rgba(0, 0, 0, 0.1);
         }
-        .name-input, #itemInput {
-            padding: 12px;
+        input {
+            flex: 1;
+            padding: 10px;
             border: none;
             border-radius: 4px;
-            margin-right: 10px;
-            width: 60%;
-            max-width: 400px;
-            font-size: 1em;
-            outline: none;
-        }
-        .name-input:focus, #itemInput:focus {
-            border: 2px solid #4CAF50;
         }
         button {
-            padding: 12px 20px;
+            padding: 10px;
             border: none;
-            background-color: #4CAF50;
+            background: #4a90e2;
             color: white;
-            border-radius: 4px;
             cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        @media (max-width: 600px) {
-            .name-input, #itemInput {
-                width: 100%;
-            }
+            border-radius: 4px;
+            margin-left: 5px;
         }
     </style>
 </head>
 <body>
-    <a href="login.html" class="link">Login/Signup</a>
-    <h1>Anonymous Live Chat</h1>
-    <div class="chat-container">
-        <ul id="itemList"></ul>
-        <div class="input-container">
-            <input type="text" class="name-input" id="nameInput" placeholder="Enter your display name (max 15 chars)" required maxlength="15">
-            <input type="text" id="itemInput" placeholder="Enter your message (max 1000 characters)" required maxlength="1000">
-            <button type="submit">Send</button>
-        </div>
+    <div class="header">
+        Anonymous Live Chat
+        <a href="login.html" class="login-link">Login/Signup</a>
+    </div>
+    <div class="chat-container" id="chatContainer"></div>
+    <div class="input-container">
+        <input type="text" id="username" placeholder="Enter your name (max 15 chars)" maxlength="15">
+        <input type="text" id="message" placeholder="Enter message (max 1000 chars)" maxlength="1000">
+        <button onclick="sendMessage()">Send</button>
     </div>
 
     <script>
-        const itemForm = document.getElementById('itemForm');
-        const itemList = document.getElementById('itemList');
-
-        async function fetchItems() {
+        async function fetchMessages() {
             const response = await fetch('/.netlify/functions/chat');
             const data = await response.json();
-            displayItems(data.items);
+            displayMessages(data.messages);
         }
 
-        function displayItems(items) {
-            itemList.innerHTML = '';
-            items.forEach(item => {
-                const li = document.createElement('li');
-                li.textContent = item;
-                itemList.appendChild(li);
+        function displayMessages(messages) {
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.innerHTML = '';
+            messages.forEach(msg => {
+                const div = document.createElement('div');
+                div.classList.add('message');
+                div.textContent = `${msg.username}: ${msg.text}`;
+                chatContainer.appendChild(div);
             });
-            itemList.scrollTop = itemList.scrollHeight; // Scroll to the bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        document.querySelector('.input-container button').addEventListener('click', async function(event) {
-            event.preventDefault();
-            const nameInput = document.getElementById('nameInput');
-            const itemInput = document.getElementById('itemInput');
-            const name = nameInput.value.trim();
-            const item = itemInput.value.trim();
+        async function sendMessage() {
+            const username = document.getElementById('username').value.trim();
+            const message = document.getElementById('message').value.trim();
 
-            if (!name || !item) {
-                alert('Username and message cannot be blank or just spaces.');
+            if (!username || !message) {
+                alert('Username and message cannot be blank!');
                 return;
             }
 
-            const message = `${name}: ${item}`;
-
-            const response = await fetch('/.netlify/functions/chat', {
+            await fetch('/.netlify/functions/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ item: message })
+                body: JSON.stringify({ username, text: message })
             });
 
-            const data = await response.json();
-            if (data.success) {
-                itemInput.value = '';
-                fetchItems();
-            } else {
-                alert('Message is invalid.');
-            }
-        });
+            document.getElementById('message').value = '';
+            fetchMessages();
+        }
 
-        fetchItems();
+        setInterval(fetchMessages, 2000);
+        fetchMessages();
     </script>
 </body>
 </html>
