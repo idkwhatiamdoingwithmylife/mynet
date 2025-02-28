@@ -1,40 +1,26 @@
-async function fetchMessages() {
-    const response = await fetch('/.netlify/functions/chat');
-    const data = await response.json();
-    displayMessages(data.messages);
-}
+exports.handler = async (event) => {
+    const messages = global.messages || [];
 
-function displayMessages(messages) {
-    const chatContainer = document.getElementById('chatContainer');
-    chatContainer.innerHTML = '';
-    messages.forEach(msg => {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message');
-        messageDiv.textContent = `${msg.username}: ${msg.text}`;
-        chatContainer.appendChild(messageDiv);
-    });
-}
-
-async function sendMessage() {
-    const username = document.getElementById('username').value.trim();
-    const message = document.getElementById('message').value.trim();
-
-    if (!username || !message) {
-        alert('Username and message cannot be empty.');
-        return;
+    if (event.httpMethod === 'GET') {
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ items: messages })
+        };
+    } 
+    
+    if (event.httpMethod === 'POST') {
+        try {
+            const { item } = JSON.parse(event.body);
+            if (!item || typeof item !== 'string' || item.trim() === '') {
+                return { statusCode: 400, body: JSON.stringify({ success: false, error: "Invalid message." }) };
+            }
+            messages.push(item);
+            global.messages = messages.slice(-100); // Keep only last 100 messages
+            return { statusCode: 200, body: JSON.stringify({ success: true }) };
+        } catch (error) {
+            return { statusCode: 500, body: JSON.stringify({ success: false, error: "Server error." }) };
+        }
     }
-
-    const response = await fetch('/.netlify/functions/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, text: message })
-    });
-
-    if (response.ok) {
-        document.getElementById('message').value = '';
-        fetchMessages();
-    }
-}
-
-fetchMessages();
-setInterval(fetchMessages, 3000);
+    
+    return { statusCode: 405, body: JSON.stringify({ success: false, error: "Method not allowed." }) };
+};
