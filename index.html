@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Add/Remove from List</title>
+    <title>Simple Add to List</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,9 +19,8 @@
 </head>
 <body>
 
-    <h1>Manage "hi" in List</h1>
+    <h1>Click to Add "hi" to List</h1>
     <button onclick="addHiToList()">Add "hi"</button>
-    <button onclick="removeHiFromList()">Remove "hi"</button>
 
     <div id="list">
         <h2>Current List:</h2>
@@ -46,23 +45,6 @@
             });
         }
 
-        function removeHiFromList() {
-            fetch('/.netlify/functions/api', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ action: 'remove' })
-            })
-            .then(response => response.json())
-            .then(data => {
-                updateList(data.list);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }
-
         function updateList(list) {
             const listItems = document.getElementById('listItems');
             listItems.innerHTML = '';  // Clear the existing list
@@ -73,6 +55,7 @@
             });
         }
 
+        // Fetch initial list from server
         window.onload = function() {
             fetch('/.netlify/functions/api')
                 .then(response => response.json())
