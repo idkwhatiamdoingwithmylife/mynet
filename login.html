@@ -3,126 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login/Signup</title>
+    <title>Login - Anonymous Live Chat</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(to bottom right, #4CAF50, #81C784);
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
-        }
-        h1 {
-            text-align: center;
-        }
-        input {
-            display: block;
-            margin: 10px 0;
-            padding: 10px;
-            width: 100%;
-            font-size: 1em;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            outline: none;
-        }
-        button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.2em;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .toggle {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .back-button {
-            background-color: #000;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            margin-bottom: 10px;
-        }
+        body { font-family: 'Arial', sans-serif; background: linear-gradient(to bottom right, #4CAF50, #81C784); margin: 0; padding: 0; color: #fff; display: flex; flex-direction: column; height: 100vh; justify-content: center; }
+        h1 { font-size: 2.5em; margin: 20px; text-align: center; }
+        .input-container { display: flex; flex-direction: column; align-items: center; }
+        .name-input { padding: 12px; border: none; border-radius: 4px; margin: 10px 0; width: 60%; max-width: 400px; font-size: 1em; }
+        .name-input:focus { border: 2px solid #4CAF50; }
+        button { padding: 12px 20px; border: none; background-color: #4CAF50; color: white; border-radius: 4px; cursor: pointer; font-size: 1em; transition: background-color 0.3s; }
+        button:hover { background-color: #45a049; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <button class="back-button" onclick="window.location.href='index.html'">Back to Chat</button>
-        <h1 id="formTitle">Login</h1>
-        <form id="loginForm">
-            <input type="text" id="loginUsername" placeholder="Username" required>
-            <input type="password" id="loginPassword" placeholder="Password" required>
-            <button type="submit">Login</button>
-        </form>
-        <div class="toggle" id="signupToggle">Don't have an account? <span id="toggleSignup" style="color: #4CAF50;">Sign Up</span></div>
-
-        <form id="signupForm" style="display:none;">
-            <h1 id="signupTitle">Sign Up</h1>
-            <input type="text" id="signupUsername" placeholder="Username" required>
-            <input type="password" id="signupPassword" placeholder="Password" required>
-            <button type="submit">Sign Up</button>
-        </form>
-        <div class="toggle" id="toggleLogin" style="display:none;">Already have an account? <span style="color: #4CAF50;">Login</span></div>
+    <h1>Login to Anonymous Live Chat</h1>
+    <div class="input-container">
+        <input type="text" class="name-input" id="usernameInput" placeholder="Enter your display name (max 15 chars)" maxlength="15" required>
+        <button onclick="login()">Login</button>
     </div>
 
     <script>
-        const loginForm = document.getElementById('loginForm');
-        const signupForm = document.getElementById('signupForm');
-        const toggleSignup = document.getElementById('toggleSignup');
-        const toggleLogin = document.getElementById('toggleLogin');
-        const formTitle = document.getElementById('formTitle');
-        const loginTitle = document.getElementById('loginTitle');
-        const signupTitle = document.getElementById('signupTitle');
+        function login() {
+            const username = document.getElementById('usernameInput').value.trim();
 
-        toggleSignup.addEventListener('click', function() {
-            loginForm.style.display = 'none';
-            signupForm.style.display = 'block';
-            toggleSignup.style.display = 'none';
-            toggleLogin.style.display = 'block';
-            formTitle.textContent = 'Sign Up';
-        });
+            if (!username) {
+                alert('Username cannot be empty');
+                return;
+            }
 
-        toggleLogin.addEventListener('click', function() {
-            signupForm.style.display = 'none';
-            loginForm.style.display = 'block';
-            toggleSignup.style.display = 'block';
-            toggleLogin.style.display = 'none';
-            formTitle.textContent = 'Login';
-        });
-
-        loginForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-            // Handle login logic (e.g., check credentials, create session, etc.)
-            alert('Logged in successfully!');
-        });
-
-        signupForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const username = document.getElementById('signupUsername').value;
-            const password = document.getElementById('signupPassword').value;
-            // Handle signup logic (e.g., create new user in the database, etc.)
-            alert('Account created successfully!');
-        });
+            localStorage.setItem('username', username);
+            window.location.href = 'index.html';
+        }
     </script>
 </body>
 </html>
