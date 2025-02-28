@@ -3,14 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login / Sign Up</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            background-color: #f4f4f9;
             text-align: center;
         }
-        input[type="text"], input[type="password"] {
+        .form-section {
+            display: inline-block;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"], input[type="password"], input[type="color"] {
             padding: 10px;
             margin-bottom: 10px;
             width: 80%;
@@ -21,6 +29,7 @@
         }
         button {
             padding: 10px 20px;
+            font-size: 16px;
             background-color: #4CAF50;
             color: white;
             border: none;
@@ -35,36 +44,75 @@
 </head>
 <body>
 
-    <h1>Login</h1>
+    <h1>Login / Create Account</h1>
 
-    <label for="loginUsername">Username:</label>
-    <input type="text" id="loginUsername" placeholder="Enter your username..." />
+    <div class="form-section">
+        <h2>Login</h2>
+        <label for="username">Username:</label>
+        <input type="text" id="loginUsername" placeholder="Enter your username" />
+        <label for="password">Password:</label>
+        <input type="password" id="loginPassword" placeholder="Enter your password" />
+        <button onclick="login()">Login</button>
+    </div>
 
-    <label for="loginPassword">Password:</label>
-    <input type="password" id="loginPassword" placeholder="Enter your password..." />
+    <br><br>
 
-    <button onclick="login()">Login</button>
+    <div class="form-section">
+        <h2>Create Account</h2>
+        <label for="username">Username:</label>
+        <input type="text" id="signupUsername" placeholder="Enter your username" />
+        <label for="password">Password:</label>
+        <input type="password" id="signupPassword" placeholder="Enter your password" />
+        <button onclick="createAccount()">Create Account</button>
+    </div>
 
     <script>
         function login() {
             const username = document.getElementById("loginUsername").value.trim();
             const password = document.getElementById("loginPassword").value.trim();
 
-            fetch('/.netlify/functions/api', {
+            if (!username || !password) {
+                alert("Please enter both username and password.");
+                return;
+            }
+
+            fetch('/.netlify/functions/login', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'login', username, password })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    localStorage.setItem('user', JSON.stringify({ username, color: data.color }));
-                    alert("Login successful!");
-                    window.location.href = "index.html";
+                    localStorage.setItem('user', JSON.stringify({ username: data.username, color: data.color }));
+                    window.location.href = 'index.html';
                 } else {
                     alert("Invalid username or password.");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function createAccount() {
+            const username = document.getElementById("signupUsername").value.trim();
+            const password = document.getElementById("signupPassword").value.trim();
+
+            if (!username || !password) {
+                alert("Please enter both username and password.");
+                return;
+            }
+
+            fetch('/.netlify/functions/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'createAccount', username, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Account created successfully! Please login.");
+                } else {
+                    alert(data.message);
                 }
             })
             .catch(error => console.error('Error:', error));
