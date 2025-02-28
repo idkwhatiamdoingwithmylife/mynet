@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Anonymously</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #chat {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            max-width: 500px;
+        }
+        #messages {
+            list-style: none;
+            padding: 0;
+        }
+        .message {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Chat Anonymously</h1>
+
+    <label for="color">Choose Text Color:</label>
+    <input type="color" id="color" value="#000000" />
+
+    <br><br>
+
+    <input type="text" id="messageInput" placeholder="Type your message..." />
+    <button onclick="sendMessage()">Send</button>
+
+    <div id="chat">
+        <h2>Messages:</h2>
+        <ul id="messages"></ul>
+    </div>
+
+    <script>
+        function sendMessage() {
+            const color = document.getElementById('color').value;
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+
+            if (message) {
+                fetch('/.netlify/functions/api', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ action: 'sendMessage', message, color })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    updateMessages(data.list);
+                    messageInput.value = ''; // Clear input after sending
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+
+        function updateMessages(messages) {
+            const messagesList = document.getElementById('messages');
+            messagesList.innerHTML = '';
+
+            messages.forEach(item => {
+                const li = document.createElement('li');
+                li.className = "message";
+                li.innerHTML = `<span style="color:${item.color}">${item.message}</span>`;
+                messagesList.appendChild(li);
+            });
+        }
+
+        function fetchMessages() {
+            fetch('/.netlify/functions/api')
+                .then(response => response.json())
+                .then(data => {
+                    updateMessages(data.list);
+                })
+                .catch(error => console.error('Error fetching messages:', error));
+        }
+
+        window.onload = function() {
+            fetchMessages();
+            setInterval(fetchMessages, 2000);  // Poll every 2 seconds for live updates
+        };
+    </script>
+
+</body>
+</html>
