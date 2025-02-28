@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+
+    <h1>Login</h1>
+
+    <label for="loginUsername">Username:</label>
+    <input type="text" id="loginUsername" placeholder="Enter your username..." />
+
+    <label for="loginPassword">Password:</label>
+    <input type="password" id="loginPassword" placeholder="Enter your password..." />
+
+    <button onclick="login()">Login</button>
+
+    <script>
+        function login() {
+            const username = document.getElementById("loginUsername").value.trim();
+            const password = document.getElementById("loginPassword").value.trim();
+
+            fetch('/.netlify/functions/api', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: 'login', username, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    localStorage.setItem('user', JSON.stringify({ username, color: data.color }));
+                    alert("Login successful!");
+                    window.location.href = "index.html";
+                } else {
+                    alert("Invalid username or password.");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+
+</body>
+</html>
