@@ -1,41 +1,40 @@
-let items = [];
-
-function addItem(item) {
-    if (item && item.length <= 1000) {
-        items.push(item);
-        return true;
-    }
-    return false;
+async function fetchMessages() {
+    const response = await fetch('/.netlify/functions/chat');
+    const data = await response.json();
+    displayMessages(data.messages);
 }
 
-function getItems() {
-    return items;
-}
-
-document.getElementById('itemForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const nameInput = document.getElementById('nameInput');
-    const itemInput = document.getElementById('itemInput');
-    const name = nameInput.value.trim() || 'Anonymous';
-    const item = itemInput.value.trim();
-
-    const message = `${name}: ${item}`;
-
-    if (addItem(message)) {
-        itemInput.value = '';
-        displayItems();
-    } else {
-        alert('Message is invalid.');
-    }
-});
-
-function displayItems() {
-    const itemList = document.getElementById('itemList');
-    itemList.innerHTML = '';
-    const itemsToDisplay = getItems();
-    itemsToDisplay.forEach(function(item) {
-        const li = document.createElement('li');
-        li.textContent = item;
-        itemList.appendChild(li);
+function displayMessages(messages) {
+    const chatContainer = document.getElementById('chatContainer');
+    chatContainer.innerHTML = '';
+    messages.forEach(msg => {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message');
+        messageDiv.textContent = `${msg.username}: ${msg.text}`;
+        chatContainer.appendChild(messageDiv);
     });
 }
+
+async function sendMessage() {
+    const username = document.getElementById('username').value.trim();
+    const message = document.getElementById('message').value.trim();
+
+    if (!username || !message) {
+        alert('Username and message cannot be empty.');
+        return;
+    }
+
+    const response = await fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, text: message })
+    });
+
+    if (response.ok) {
+        document.getElementById('message').value = '';
+        fetchMessages();
+    }
+}
+
+fetchMessages();
+setInterval(fetchMessages, 3000);
