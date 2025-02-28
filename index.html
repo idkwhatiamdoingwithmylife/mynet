@@ -30,12 +30,13 @@
 
     <script>
         function addHiToList() {
+            // Always send "hi" when adding
             fetch('/.netlify/functions/api', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ action: 'add' })
+                body: JSON.stringify({ action: 'add', message: 'hi' })
             })
             .then(response => response.json())
             .then(data => {
@@ -47,12 +48,13 @@
         }
 
         function removeHiFromList() {
+            // Always remove "hi" when removing
             fetch('/.netlify/functions/api', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ action: 'remove' })
+                body: JSON.stringify({ action: 'remove', message: 'hi' })
             })
             .then(response => response.json())
             .then(data => {
