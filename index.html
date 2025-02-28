@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Add/Remove from List</title>
+    <title>Live Message Board</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,52 +15,46 @@
             background-color: #f0f0f0;
             border-radius: 5px;
         }
+        #messageInput {
+            margin-top: 20px;
+            padding: 10px;
+            width: 100%;
+            max-width: 400px;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Manage "hi" in List</h1>
-    <button onclick="addHiToList()">Add "hi"</button>
-    <button onclick="removeHiFromList()">Remove "hi"</button>
+    <h1>Live Message Board</h1>
+    <input type="text" id="messageInput" placeholder="Type your message..." />
+    <button onclick="sendMessage()">Send Message</button>
 
     <div id="list">
-        <h2>Current List:</h2>
+        <h2>Messages:</h2>
         <ul id="listItems"></ul>
     </div>
 
     <script>
-        function addHiToList() {
-            fetch('/.netlify/functions/api', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ action: 'add' })
-            })
-            .then(response => response.json())
-            .then(data => {
-                updateList(data.list);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }
-
-        function removeHiFromList() {
-            fetch('/.netlify/functions/api', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ action: 'remove' })
-            })
-            .then(response => response.json())
-            .then(data => {
-                updateList(data.list);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            if (message) {
+                fetch('/.netlify/functions/api', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ action: 'sendMessage', message: message })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    updateList(data.list);
+                    messageInput.value = ''; // Clear the input after sending
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
         }
 
         function updateList(list) {
@@ -84,7 +78,7 @@
 
         window.onload = function() {
             fetchList();
-            setInterval(fetchList, 400);
+            setInterval(fetchList, 500);
         };
     </script>
     
