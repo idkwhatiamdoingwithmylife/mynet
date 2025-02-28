@@ -43,11 +43,13 @@
     </div>
 
     <script>
-        const apiUrl = 'https://anonymous-chat-now.netlify.app/api/api.js'; // Use your actual Netlify API URL
+        const apiUrl = 'https://anonymous-chat-now.netlify.app/api/api.js'; // Your actual Netlify API URL
 
         async function addItem() {
             const itemInput = document.getElementById('item-input');
             const itemValue = itemInput.value.trim();
+
+            // Check if the input is valid
             if (itemValue === '') {
                 alert('Please enter an item!');
                 return;
@@ -57,14 +59,15 @@
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ item: itemValue })
+                    body: JSON.stringify({ item: itemValue })  // Properly stringify the data
                 });
 
                 if (response.ok) {
                     itemInput.value = ''; // Clear input after successful add
                     loadItems(); // Reload item list
                 } else {
-                    alert('Failed to add item');
+                    const errorData = await response.json();
+                    alert(`Error: ${errorData.message}`);
                 }
             } catch (error) {
                 alert('Error connecting to the server');
