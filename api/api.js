@@ -1,16 +1,26 @@
-exports.handler = async (event) => {
-    const messages = global.messages || [];
-    
-    if (event.httpMethod === "POST") {
-        const data = JSON.parse(event.body || "{}");
-        
-        if (data.action === "sendMessage") {
-            messages.push({ username: data.username, message: data.message, color: data.color });
+let messages = [];
+let messagesKey = 'CHAT_MESSAGES';
 
-            global.messages = messages.slice(-100);
-            return { statusCode: 200, body: JSON.stringify({ success: true }) };
-        }
+exports.handler = async function(event, context) {
+    if (process.env[messagesKey]) {
+        messages = JSON.parse(process.env[messagesKey]);
     }
 
-    return { statusCode: 200, body: JSON.stringify({ list: messages }) };
+    if (event.httpMethod === 'POST') {
+        const body = JSON.parse(event.body);
+
+        if (body.action === 'sendMessage' && body.message && body.color) {
+            messages.push({
+                message: body.message,
+                color: body.color
+            });
+        }
+
+        process.env[messagesKey] = JSON.stringify(messages);
+    }
+
+    return {
+        statusCode: 200,
+        body: JSON.stringify({ list: messages })
+    };
 };
