@@ -29,7 +29,6 @@
     </div>
 
     <script>
-        // Function to add "hi" to the list
         function addHiToList() {
             fetch('/.netlify/functions/api', {
                 method: 'POST',
@@ -40,14 +39,13 @@
             })
             .then(response => response.json())
             .then(data => {
-                updateList(data.list);  // Update the displayed list
+                updateList(data.list);
             })
             .catch(error => {
                 console.error('Error:', error);
             });
         }
 
-        // Function to remove "hi" from the list
         function removeHiFromList() {
             fetch('/.netlify/functions/api', {
                 method: 'POST',
@@ -58,17 +56,16 @@
             })
             .then(response => response.json())
             .then(data => {
-                updateList(data.list);  // Update the displayed list
+                updateList(data.list);
             })
             .catch(error => {
                 console.error('Error:', error);
             });
         }
 
-        // Function to update the displayed list
         function updateList(list) {
             const listItems = document.getElementById('listItems');
-            listItems.innerHTML = '';  // Clear the existing list
+            listItems.innerHTML = '';
             list.forEach(item => {
                 const li = document.createElement('li');
                 li.textContent = item;
@@ -76,12 +73,11 @@
             });
         }
 
-        // Fetch the current list when the page loads
         window.onload = function() {
             fetch('/.netlify/functions/api')
                 .then(response => response.json())
                 .then(data => {
-                    updateList(data.list);  // Display the initial list
+                    updateList(data.list);
                 })
                 .catch(error => console.error('Error fetching list:', error));
         };
