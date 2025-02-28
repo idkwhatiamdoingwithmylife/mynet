@@ -1,24 +1,13 @@
-const fs = require('fs');
-const path = require('path');
-
-const filePath = path.resolve(__dirname, 'messages.json');
+// In-memory store (not persistent across function calls)
+let messages = [];
 
 exports.handler = async function(event, context) {
     if (event.httpMethod === 'GET') {
-        // Read the stored messages
-        try {
-            const data = fs.readFileSync(filePath, 'utf-8');
-            const messages = JSON.parse(data);
-            return {
-                statusCode: 200,
-                body: JSON.stringify({ items: messages }),
-            };
-        } catch (err) {
-            return {
-                statusCode: 500,
-                body: JSON.stringify({ error: 'Failed to read messages.' }),
-            };
-        }
+        // Return the stored messages
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ items: messages }),
+        };
     }
 
     if (event.httpMethod === 'POST') {
@@ -32,15 +21,8 @@ exports.handler = async function(event, context) {
                 };
             }
 
-            // Read existing messages
-            let data = fs.readFileSync(filePath, 'utf-8');
-            let messages = JSON.parse(data);
-
-            // Add the new message
+            // Add the new message to in-memory store
             messages.push(item);
-
-            // Write the updated messages to the file
-            fs.writeFileSync(filePath, JSON.stringify(messages));
 
             return {
                 statusCode: 200,
