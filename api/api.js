@@ -1,6 +1,5 @@
 // api.js (Netlify Function)
 
-// Simulating in-memory storage for users and messages (note: data will be lost on server reset)
 let users = [];
 let messages = [];
 
@@ -8,7 +7,7 @@ exports.handler = async (event, context) => {
   const { action } = JSON.parse(event.body || '{}');
   const response = {
     statusCode: 200,
-    body: JSON.stringify({ success: true, list: messages }),
+    body: JSON.stringify({ success: true, list: messages }), // Ensure the messages are sent as part of the response
   };
 
   // Handle creating a new account (username and password)
