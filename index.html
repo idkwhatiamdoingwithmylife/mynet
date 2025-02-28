@@ -1,80 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat Anonymously</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-    .button { padding: 10px 20px; margin: 5px; cursor: pointer; font-size: 16px; }
-    .chat-box { margin-top: 20px; max-width: 600px; }
-    .messages { margin-bottom: 10px; max-height: 400px; overflow-y: auto; }
-    input, select { padding: 10px; margin-bottom: 10px; width: 100%; max-width: 300px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Anonymously</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f9; }
+        .chat-box { max-width: 600px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
+        .chat-list { list-style-type: none; padding: 0; margin: 20px 0; }
+        .chat-list li { padding: 8px; margin: 4px 0; border-radius: 4px; }
+        .chat-list li span { font-weight: bold; }
+        .button { background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        .button:hover { background-color: #45a049; }
+        .input-box { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        .message-box { margin-top: 10px; }
+        .form-input { width: 100%; margin-bottom: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+    </style>
 </head>
 <body>
-  <h1>Welcome to Chat Anonymously</h1>
-  <button class="button" id="loginBtn">Login</button>
-  <button class="button" id="makeAccountBtn">Make Account</button>
+    <div class="chat-box">
+        <h2>Chat Anonymously</h2>
+        <input type="text" id="username" class="form-input" placeholder="Enter your username" required>
+        <input type="color" id="color" class="form-input" value="#000000">
+        <button class="button" id="createAccount">Make Account</button>
+        <button class="button" id="loginButton">Login</button>
 
-  <div id="chat" style="display:none;">
-    <h2>Chat</h2>
-    <div class="messages" id="messageBox"></div>
-    <input type="text" id="messageInput" placeholder="Enter message" />
-    <button class="button" id="sendMessageBtn">Send Message</button>
-  </div>
+        <h3>Messages:</h3>
+        <ul id="messages" class="chat-list"></ul>
 
-  <script>
-    document.getElementById('makeAccountBtn').onclick = function() {
-      window.location.href = '/login.html'; // Navigate to login page
-    };
+        <div class="message-box">
+            <input type="text" id="message" class="input-box" placeholder="Enter your message..." maxlength="1000">
+            <button class="button" id="sendMessage">Send</button>
+        </div>
+    </div>
 
-    document.getElementById('loginBtn').onclick = function() {
-      const username = prompt("Enter your username:");
-      const password = prompt("Enter your password:");
-      const color = prompt("Enter your text color:");
+    <script>
+        const messagesElement = document.getElementById('messages');
+        const sendMessageButton = document.getElementById('sendMessage');
+        const usernameInput = document.getElementById('username');
+        const colorInput = document.getElementById('color');
+        const createAccountButton = document.getElementById('createAccount');
+        const loginButton = document.getElementById('loginButton');
 
-      if (username && password && color) {
-        fetch('/api/api.js', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'login', username, password })
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            alert('Logged in successfully!');
-            document.getElementById('chat').style.display = 'block';
-          } else {
-            alert('Invalid credentials!');
-          }
-        });
-      }
-    };
+        let currentUser = null;
 
-    document.getElementById('sendMessageBtn').onclick = function() {
-      const message = document.getElementById('messageInput').value;
-      const username = prompt("Enter your username:"); // Ideally, use a session or store the username
-      const color = prompt("Enter your text color:"); // Same as above
+        async function fetchMessages() {
+            const response = await fetch('/api/api.js');
+            const data = await response.json();
+            messagesElement.innerHTML = data.list.map(msg => `<li><span style="color:${msg.color};">${msg.username}</span>: ${msg.message}</li>`).join('');
+        }
 
-      fetch('/api/api.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'sendMessage', username, message, color })
-      })
-      .then(response => response.json())
-      .then(data => {
-        const messages = data.list || [];
-        const messageBox = document.getElementById('messageBox');
-        messageBox.innerHTML = '';
-        messages.forEach(msg => {
-          const msgDiv = document.createElement('div');
-          msgDiv.style.color = msg.color;
-          msgDiv.innerText = `${msg.username}: ${msg.message}`;
-          messageBox.appendChild(msgDiv);
-        });
-      });
-    };
-  </script>
+        async function sendMessage() {
+            const message = document.getElementById('message').value;
+            if (!message || !currentUser) return;
+
+            const response = await fetch('/api/api.js', {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'sendMessage',
+                    username: currentUser.username,
+                    message: message,
+                    color: currentUser.color
+                })
+            });
+            const data = await response.json();
+            if (data.list) {
+                fetchMessages();
+            }
+            document.getElementById('message').value = '';
+        }
+
+        async function createAccount() {
+            const username = usernameInput.value;
+            const password = prompt("Enter a password (at least 4 characters):");
+            if (username.length < 5 || password.length < 4) {
+                alert("Username must be at least 5 characters and password at least 4 characters.");
+                return;
+            }
+
+            const color = colorInput.value;
+            const response = await fetch('/api/api.js', {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'createAccount',
+                    username: username,
+                    password: password,
+                    color: color
+                })
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert("Account created successfully!");
+                currentUser = { username, color };
+                fetchMessages();
+            } else {
+                alert("Username already exists.");
+            }
+        }
+
+        async function login() {
+            const username = usernameInput.value;
+            const password = prompt("Enter your password:");
+            const response = await fetch('/api/api.js', {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'login',
+                    username: username,
+                    password: password
+                })
+            });
+            const data = await response.json();
+            if (data.success) {
+                currentUser = { username, color: data.color };
+                alert("Login successful!");
+                fetchMessages();
+            } else {
+                alert("Invalid credentials.");
+            }
+        }
+
+        createAccountButton.addEventListener('click', createAccount);
+        loginButton.addEventListener('click', login);
+        sendMessageButton.addEventListener('click', sendMessage);
+        fetchMessages();
+    </script>
 </body>
 </html>
