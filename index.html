@@ -29,7 +29,7 @@
 
     <script>
         function addHiToList() {
-            fetch('/api/api.js', {
+            fetch('/.netlify/functions/api', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -53,7 +53,7 @@
 
         // Fetch initial list from server
         window.onload = function() {
-            fetch('/api/api.js')
+            fetch('/.netlify/functions/api')
                 .then(response => response.json())
                 .then(data => {
                     const listItems = document.getElementById('listItems');
