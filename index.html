@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Add/Remove from List</title>
+    <title>Live Update List</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,7 +19,7 @@
 </head>
 <body>
 
-    <h1>Manage "hi" in List</h1>
+    <h1>Live Update "hi" List</h1>
     <button onclick="addHiToList()">Add "hi"</button>
     <button onclick="removeHiFromList()">Remove "hi"</button>
 
@@ -30,7 +30,6 @@
 
     <script>
         function addHiToList() {
-            // Always send "hi" when adding
             fetch('/.netlify/functions/api', {
                 method: 'POST',
                 headers: {
@@ -48,7 +47,6 @@
         }
 
         function removeHiFromList() {
-            // Always remove "hi" when removing
             fetch('/.netlify/functions/api', {
                 method: 'POST',
                 headers: {
@@ -84,6 +82,6 @@
                 .catch(error => console.error('Error fetching list:', error));
         };
     </script>
-    
+
 </body>
 </html>
