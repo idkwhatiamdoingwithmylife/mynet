@@ -1,5 +1,10 @@
 [build]
   functions = "api"
+  publish = "."
+
+[dev]
+  functions = "api"
+  publish = "."
 
 [[redirects]]
   from = "/api/*"
