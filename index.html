@@ -13,8 +13,8 @@
         }
         .top-buttons {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: center;
+            gap: 20px;
             margin-bottom: 20px;
         }
         .top-buttons button {
@@ -68,21 +68,14 @@
             font-size: 28px;
             color: #333;
         }
-        .user-welcome {
-            font-size: 20px;
-            font-weight: bold;
-            margin-top: 10px;
-        }
     </style>
 </head>
 <body>
 
     <div class="top-buttons">
-        <div>
-            <button onclick="window.location.href='login.html'">Login</button>
-            <button onclick="makeAccount()">Make Account</button>
-        </div>
-        <div class="user-welcome" id="welcomeMessage"></div>
+        <h1>Chat Anonymously</h1>
+        <button onclick="window.location.href='login.html'">Login</button>
+        <button onclick="makeAccount()">Make Account</button>
     </div>
 
     <div id="accountSection" style="display: none;">
@@ -109,15 +102,7 @@
     </div>
 
     <script>
-        let user = JSON.parse(localStorage.getItem('user')) || {};
-
-        // Function to create a guest username if none exists
-        function createGuestUser() {
-            if (!user.username) {
-                user = { username: 'guest' + Math.floor(Math.random() * 10000), color: '#000000' };
-                localStorage.setItem('user', JSON.stringify(user));
-            }
-        }
+        let user = JSON.parse(localStorage.getItem('user')) || { username: 'guest' + Math.floor(Math.random() * 10000) };
 
         function makeAccount() {
             document.getElementById("accountSection").style.display = "block";
@@ -166,8 +151,6 @@
 
             if (!message) return;
 
-            createGuestUser();  // Ensure there's always a user
-
             fetch('/.netlify/functions/api', {
                 method: 'POST',
                 headers: {
@@ -206,11 +189,7 @@
 
         window.onload = function() {
             fetchMessages();
-            setInterval(fetchMessages, 2000);
-
-            createGuestUser();  // Ensure there's always a guest user
-
-            document.getElementById("welcomeMessage").textContent = `Welcome, ${user.username}!`;
+            setInterval(fetchMessages, 2000); // Update messages every 2 seconds
         };
     </script>
 
