@@ -29,6 +29,9 @@
 
     <h1>Chat Anonymously</h1>
 
+    <label for="username">Username:</label>
+    <input type="text" id="username" placeholder="Optional..." />
+
     <label for="color">Choose Text Color:</label>
     <input type="color" id="color" value="#000000" />
 
@@ -43,10 +46,19 @@
     </div>
 
     <script>
+        function getRandomGuestName() {
+            return "Guest" + Math.floor(10000 + Math.random() * 90000);
+        }
+
         function sendMessage() {
+            let username = document.getElementById('username').value.trim();
             const color = document.getElementById('color').value;
             const messageInput = document.getElementById('messageInput');
             const message = messageInput.value.trim();
+
+            if (!username) {
+                username = getRandomGuestName();
+            }
 
             if (message) {
                 fetch('/.netlify/functions/api', {
@@ -54,7 +66,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ action: 'sendMessage', message, color })
+                    body: JSON.stringify({ action: 'sendMessage', username, message, color })
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -74,7 +86,7 @@
             messages.forEach(item => {
                 const li = document.createElement('li');
                 li.className = "message";
-                li.innerHTML = `<span style="color:${item.color}">${item.message}</span>`;
+                li.innerHTML = `<strong style="color:${item.color}">${item.username}:</strong> ${item.message}`;
                 messagesList.appendChild(li);
             });
         }
