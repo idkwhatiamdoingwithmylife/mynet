@@ -111,6 +111,14 @@
     <script>
         let user = JSON.parse(localStorage.getItem('user')) || {};
 
+        // Function to create a guest username if none exists
+        function createGuestUser() {
+            if (!user.username) {
+                user = { username: 'guest' + Math.floor(Math.random() * 10000), color: '#000000' };
+                localStorage.setItem('user', JSON.stringify(user));
+            }
+        }
+
         function makeAccount() {
             document.getElementById("accountSection").style.display = "block";
         }
@@ -158,10 +166,7 @@
 
             if (!message) return;
 
-            if (!user.username) {
-                alert("Please log in first.");
-                return;
-            }
+            createGuestUser();  // Ensure there's always a user
 
             fetch('/.netlify/functions/api', {
                 method: 'POST',
@@ -203,11 +208,9 @@
             fetchMessages();
             setInterval(fetchMessages, 2000);
 
-            if (user.username) {
-                document.getElementById("welcomeMessage").textContent = `Welcome, ${user.username}!`;
-            } else {
-                document.getElementById("welcomeMessage").textContent = "Welcome, Guest!";
-            }
+            createGuestUser();  // Ensure there's always a guest user
+
+            document.getElementById("welcomeMessage").textContent = `Welcome, ${user.username}!`;
         };
     </script>
 
