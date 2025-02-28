@@ -1,30 +1,23 @@
-let list = [];
-let listKey = 'HI_LIST';
+let messages = [];
+let messagesKey = 'MESSAGES_LIST';
 
 exports.handler = async function(event, context) {
-    if (process.env[listKey]) {
-        list = JSON.parse(process.env[listKey]);
+    if (process.env[messagesKey]) {
+        messages = JSON.parse(process.env[messagesKey]);
     }
 
     if (event.httpMethod === 'POST') {
         const body = JSON.parse(event.body);
 
-        if (body.action === 'add') {
-            list.push('hi');
+        if (body.action === 'sendMessage' && body.message) {
+            messages.push(body.message);
         }
 
-        if (body.action === 'remove') {
-            const index = list.lastIndexOf('hi');
-            if (index !== -1) {
-                list.splice(index, 1);
-            }
-        }
-
-        process.env[listKey] = JSON.stringify(list);
+        process.env[messagesKey] = JSON.stringify(messages);
     }
 
     return {
         statusCode: 200,
-        body: JSON.stringify({ list: list })
+        body: JSON.stringify({ list: messages })
     };
 };
