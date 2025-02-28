@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Update List</title>
+    <title>Simple Add/Remove from List</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,7 +19,7 @@
 </head>
 <body>
 
-    <h1>Live Update "hi" List</h1>
+    <h1>Manage "hi" in List</h1>
     <button onclick="addHiToList()">Add "hi"</button>
     <button onclick="removeHiFromList()">Remove "hi"</button>
 
@@ -35,7 +35,7 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ action: 'add', message: 'hi' })
+                body: JSON.stringify({ action: 'add' })
             })
             .then(response => response.json())
             .then(data => {
@@ -52,7 +52,7 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ action: 'remove', message: 'hi' })
+                body: JSON.stringify({ action: 'remove' })
             })
             .then(response => response.json())
             .then(data => {
@@ -82,6 +82,6 @@
                 .catch(error => console.error('Error fetching list:', error));
         };
     </script>
-
+    
 </body>
 </html>
