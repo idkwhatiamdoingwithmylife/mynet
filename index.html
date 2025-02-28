@@ -142,20 +142,10 @@
             }
 
             const message = `${name}: ${item}`;
+            itemInput.value = '';
 
-            const response = await fetch('/.netlify/functions/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ item: message })
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                itemInput.value = '';
-                fetchItems();
-            } else {
-                alert('Message is invalid.');
-            }
+            // No saving, just display the message temporarily
+            fetchItems();
         });
 
         fetchItems();
