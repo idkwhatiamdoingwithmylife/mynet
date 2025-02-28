@@ -9,9 +9,8 @@ exports.handler = async function(event, context) {
     if (event.httpMethod === 'POST') {
         const body = JSON.parse(event.body);
 
-        if (body.action === 'sendMessage' && body.username && body.message && body.color) {
+        if (body.action === 'sendMessage' && body.message && body.color) {
             messages.push({
-                username: body.username,
                 message: body.message,
                 color: body.color
             });
