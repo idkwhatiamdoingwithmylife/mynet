@@ -1,0 +1,8 @@
+[build]
+  publish = "public"       # Path to your public files
+  functions = "api"        # This folder contains your serverless functions
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api"
+  status = 200
