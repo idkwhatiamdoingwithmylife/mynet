@@ -5,124 +5,180 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Anonymously</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f9; }
-        .chat-box { max-width: 600px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
-        .chat-list { list-style-type: none; padding: 0; margin: 20px 0; }
-        .chat-list li { padding: 8px; margin: 4px 0; border-radius: 4px; }
-        .chat-list li span { font-weight: bold; }
-        .button { background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
-        .button:hover { background-color: #45a049; }
-        .input-box { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-        .message-box { margin-top: 10px; }
-        .form-input { width: 100%; margin-bottom: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .chat-container .messages {
+            max-width: 600px;
+            width: 100%;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .chat-container .message {
+            margin-bottom: 10px;
+        }
+        .chat-container input[type="text"], .chat-container textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .chat-container button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .chat-container button:hover {
+            background-color: #444;
+        }
+        .chat-container select {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+        }
+        .chat-container .username-input, .chat-container .message-input {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
     </style>
 </head>
 <body>
-    <div class="chat-box">
-        <h2>Chat Anonymously</h2>
-        <input type="text" id="username" class="form-input" placeholder="Enter your username" required>
-        <input type="color" id="color" class="form-input" value="#000000">
-        <button class="button" id="createAccount">Make Account</button>
-        <button class="button" id="loginButton">Login</button>
 
-        <h3>Messages:</h3>
-        <ul id="messages" class="chat-list"></ul>
+    <header>
+        <h1>Chat Anonymously</h1>
+    </header>
 
-        <div class="message-box">
-            <input type="text" id="message" class="input-box" placeholder="Enter your message..." maxlength="1000">
-            <button class="button" id="sendMessage">Send</button>
+    <div class="chat-container">
+        <div class="messages" id="messages"></div>
+        
+        <div class="username-input">
+            <input type="text" id="username" placeholder="Enter your username" />
+            <select id="color-select">
+                <option value="black">Black</option>
+                <option value="red">Red</option>
+                <option value="green">Green</option>
+                <option value="blue">Blue</option>
+                <option value="purple">Purple</option>
+            </select>
         </div>
+        
+        <div class="message-input">
+            <textarea id="message" placeholder="Enter your message..." maxlength="1000"></textarea>
+            <button id="send-btn">Send Message</button>
+        </div>
+        
+        <button id="make-account-btn">Make Account</button>
+        <button id="login-btn">Login</button>
     </div>
 
     <script>
         const messagesElement = document.getElementById('messages');
-        const sendMessageButton = document.getElementById('sendMessage');
+        const sendButton = document.getElementById('send-btn');
         const usernameInput = document.getElementById('username');
-        const colorInput = document.getElementById('color');
-        const createAccountButton = document.getElementById('createAccount');
-        const loginButton = document.getElementById('loginButton');
+        const colorSelect = document.getElementById('color-select');
+        const messageInput = document.getElementById('message');
+        const makeAccountButton = document.getElementById('make-account-btn');
+        const loginButton = document.getElementById('login-btn');
 
-        let currentUser = null;
+        const apiUrl = '/api/api.js';
 
-        async function fetchMessages() {
-            const response = await fetch('/api/api.js');
-            const data = await response.json();
-            messagesElement.innerHTML = data.list.map(msg => `<li><span style="color:${msg.color};">${msg.username}</span>: ${msg.message}</li>`).join('');
-        }
+        let username = '';
 
-        async function sendMessage() {
-            const message = document.getElementById('message').value;
-            if (!message || !currentUser) return;
+        sendButton.addEventListener('click', async () => {
+            const message = messageInput.value;
+            const color = colorSelect.value;
 
-            const response = await fetch('/api/api.js', {
-                method: 'POST',
-                body: JSON.stringify({
-                    action: 'sendMessage',
-                    username: currentUser.username,
-                    message: message,
-                    color: currentUser.color
-                })
-            });
-            const data = await response.json();
-            if (data.list) {
-                fetchMessages();
+            if (username && message) {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'sendMessage',
+                        username: username,
+                        message: message,
+                        color: color
+                    })
+                });
+
+                const data = await response.json();
+                if (data.list) {
+                    renderMessages(data.list);
+                }
             }
-            document.getElementById('message').value = '';
-        }
+        });
 
-        async function createAccount() {
-            const username = usernameInput.value;
-            const password = prompt("Enter a password (at least 4 characters):");
-            if (username.length < 5 || password.length < 4) {
-                alert("Username must be at least 5 characters and password at least 4 characters.");
-                return;
-            }
+        makeAccountButton.addEventListener('click', () => {
+            window.location.href = '/login.html'; 
+        });
 
-            const color = colorInput.value;
-            const response = await fetch('/api/api.js', {
+        loginButton.addEventListener('click', async () => {
+            const user = prompt('Enter your username');
+            const password = prompt('Enter your password');
+
+            const response = await fetch(apiUrl, {
                 method: 'POST',
-                body: JSON.stringify({
-                    action: 'createAccount',
-                    username: username,
-                    password: password,
-                    color: color
-                })
-            });
-            const data = await response.json();
-            if (data.success) {
-                alert("Account created successfully!");
-                currentUser = { username, color };
-                fetchMessages();
-            } else {
-                alert("Username already exists.");
-            }
-        }
-
-        async function login() {
-            const username = usernameInput.value;
-            const password = prompt("Enter your password:");
-            const response = await fetch('/api/api.js', {
-                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     action: 'login',
-                    username: username,
+                    username: user,
                     password: password
                 })
             });
+
             const data = await response.json();
             if (data.success) {
-                currentUser = { username, color: data.color };
-                alert("Login successful!");
-                fetchMessages();
+                username = user;
+                alert('Login successful');
             } else {
-                alert("Invalid credentials.");
+                alert('Invalid username or password');
+            }
+        });
+
+        function renderMessages(messages) {
+            messagesElement.innerHTML = '';
+            messages.forEach(msg => {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message');
+                messageElement.innerHTML = `<span style="color: ${msg.color};">${msg.username}:</span> ${msg.message}`;
+                messagesElement.appendChild(messageElement);
+            });
+        }
+
+        async function loadMessages() {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            if (data.list) {
+                renderMessages(data.list);
             }
         }
 
-        createAccountButton.addEventListener('click', createAccount);
-        loginButton.addEventListener('click', login);
-        sendMessageButton.addEventListener('click', sendMessage);
-        fetchMessages();
+        loadMessages();
     </script>
+
 </body>
 </html>
