@@ -6,163 +6,54 @@
     <title>Anonymous Live Chat</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(to bottom right, #4CAF50, #81C784);
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
             margin: 0;
             padding: 0;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-        h1 {
-            font-size: 2.5em;
-            margin: 20px;
-            text-align: center;
-        }
-        .link {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: rgba(255, 255, 255, 0.2);
-            padding: 10px;
-            border-radius: 5px;
-            text-decoration: none;
-            color: #fff;
-            font-size: 1em;
         }
         .chat-container {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            overflow: hidden;
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        ul {
-            list-style-type: none;
-            padding: 10px;
-            margin: 0;
+        .messages {
+            max-height: 400px;
             overflow-y: auto;
-            flex: 1;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
-        }
-        li {
-            margin: 5px 0;
+            margin-bottom: 20px;
             padding: 10px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            font-size: 0.9em;
-            border-left: 5px solid #4CAF50;
-            transition: background-color 0.3s;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
         }
-        li:hover {
-            background-color: rgba(255, 255, 255, 0.3);
+        .message {
+            margin-bottom: 10px;
         }
-        .input-container {
-            display: flex;
+        input[type="text"] {
+            width: 80%;
             padding: 10px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-top: 1px solid #ddd;
-        }
-        .name-input, #itemInput {
-            padding: 12px;
-            border: none;
-            border-radius: 4px;
+            border: 1px solid #ddd;
             margin-right: 10px;
-            width: 60%;
-            max-width: 400px;
-            font-size: 1em;
-            outline: none;
-        }
-        .name-input:focus, #itemInput:focus {
-            border: 2px solid #4CAF50;
         }
         button {
-            padding: 12px 20px;
-            border: none;
+            padding: 10px 20px;
             background-color: #4CAF50;
             color: white;
-            border-radius: 4px;
+            border: none;
             cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        @media (max-width: 600px) {
-            .name-input, #itemInput {
-                width: 100%;
-            }
         }
     </style>
 </head>
 <body>
-    <a href="login.html" class="link">Login/Signup</a>
-    <h1>Anonymous Live Chat</h1>
     <div class="chat-container">
-        <ul id="itemList"></ul>
-        <div class="input-container">
-            <input type="text" class="name-input" id="nameInput" placeholder="Enter your display name (max 15 chars)" required maxlength="15">
-            <input type="text" id="itemInput" placeholder="Enter your message (max 1000 characters)" required maxlength="1000">
-            <button type="submit">Send</button>
-        </div>
+        <h2>Anonymous Live Chat</h2>
+        <div class="messages" id="messages"></div>
+        <input type="text" id="messageInput" placeholder="Enter your message..." maxlength="1000">
+        <button onclick="sendMessage()">Send</button>
     </div>
 
-    <script>
-        async function fetchItems() {
-            const response = await fetch('/.netlify/functions/chat');
-            const data = await response.json();
-            if (data && data.items) {
-                displayItems(data.items);
-            } else {
-                console.error("No items received:", data);
-            }
-        }
-
-        function displayItems(items) {
-            const itemList = document.getElementById('itemList');
-            itemList.innerHTML = '';  // Clear the current list
-            items.forEach(item => {
-                const li = document.createElement('li');
-                li.textContent = `${item.name}: ${item.message}`;  // Properly format the display
-                itemList.appendChild(li);
-            });
-            itemList.scrollTop = itemList.scrollHeight; // Scroll to the bottom
-        }
-
-        document.querySelector('.input-container button').addEventListener('click', async function(event) {
-            event.preventDefault();
-
-            const nameInput = document.getElementById('nameInput');
-            const itemInput = document.getElementById('itemInput');
-            const name = nameInput.value.trim();
-            const message = itemInput.value.trim();
-
-            if (!name || !message) {
-                alert('Username and message cannot be blank.');
-                return;
-            }
-
-            const response = await fetch('/.netlify/functions/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, message })
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                itemInput.value = '';  // Clear the input after sending
-                fetchItems();  // Fetch and display updated messages
-            } else {
-                alert('Failed to send message.');
-            }
-        });
-
-        // Load messages on page load
-        fetchItems();
-    </script>
+    <script src="api/api.js"></script>
+    <script src="api/chat.js"></script>
 </body>
 </html>
