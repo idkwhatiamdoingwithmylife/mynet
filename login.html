@@ -3,102 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login / Sign Up</title>
+    <title>Login / Make Account</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
             background-color: #f4f4f9;
+            margin: 20px;
             text-align: center;
         }
-        .form-section {
-            display: inline-block;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+        h1 {
+            color: #333;
         }
-        input[type="text"], input[type="password"], input[type="color"] {
+
+        input[type="text"], input[type="password"] {
             padding: 10px;
-            margin-bottom: 10px;
-            width: 80%;
-            max-width: 300px;
+            width: 60%;
             border-radius: 5px;
             border: 1px solid #ccc;
             font-size: 16px;
+            margin-bottom: 10px;
         }
+
         button {
             padding: 10px 20px;
-            font-size: 16px;
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
         }
+
         button:hover {
             background-color: #45a049;
         }
+
+        .form-container {
+            margin-top: 20px;
+        }
+
+        .top-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
     </style>
 </head>
 <body>
 
-    <h1>Login / Create Account</h1>
+    <h1>Login / Make Account</h1>
 
-    <div class="form-section">
+    <div class="top-buttons">
+        <button onclick="window.location.href='index.html'">Back to Chat</button>
+    </div>
+
+    <div class="form-container">
+        <h2>Create Account</h2>
+        <input type="text" id="username" placeholder="Username" />
+        <input type="password" id="password" placeholder="Password" />
+        <button onclick="createAccount()">Create Account</button>
         <h2>Login</h2>
-        <label for="username">Username:</label>
-        <input type="text" id="loginUsername" placeholder="Enter your username" />
-        <label for="password">Password:</label>
-        <input type="password" id="loginPassword" placeholder="Enter your password" />
+        <input type="text" id="loginUsername" placeholder="Username" />
+        <input type="password" id="loginPassword" placeholder="Password" />
         <button onclick="login()">Login</button>
     </div>
 
-    <br><br>
-
-    <div class="form-section">
-        <h2>Create Account</h2>
-        <label for="username">Username:</label>
-        <input type="text" id="signupUsername" placeholder="Enter your username" />
-        <label for="password">Password:</label>
-        <input type="password" id="signupPassword" placeholder="Enter your password" />
-        <button onclick="createAccount()">Create Account</button>
-    </div>
-
     <script>
-        function login() {
-            const username = document.getElementById("loginUsername").value.trim();
-            const password = document.getElementById("loginPassword").value.trim();
-
-            if (!username || !password) {
-                alert("Please enter both username and password.");
-                return;
-            }
-
-            fetch('/.netlify/functions/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'login', username, password })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    localStorage.setItem('user', JSON.stringify({ username: data.username, color: data.color }));
-                    window.location.href = 'index.html';
-                } else {
-                    alert("Invalid username or password.");
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
-
         function createAccount() {
-            const username = document.getElementById("signupUsername").value.trim();
-            const password = document.getElementById("signupPassword").value.trim();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
 
-            if (!username || !password) {
-                alert("Please enter both username and password.");
+            if (username.length < 5 || password.length < 4) {
+                alert('Username must be at least 5 characters and password at least 4 characters');
                 return;
             }
 
@@ -110,9 +88,30 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert("Account created successfully! Please login.");
+                    alert('Account created successfully! Please log in.');
                 } else {
-                    alert(data.message);
+                    alert('Username already taken.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            fetch('/.netlify/functions/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'login', username, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = 'index.html';
+                } else {
+                    alert('Invalid login credentials');
                 }
             })
             .catch(error => console.error('Error:', error));
