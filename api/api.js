@@ -1,15 +1,32 @@
+// api.js - Server-side message storage and auto-deletion logic
+
 const messages = [];
 
+// Add a new message with a timestamp
 const addMessage = (message) => {
-    if (message.length <= 1000) {
-        messages.push(message);
+    const timestamp = Date.now();
+    messages.push({ message, timestamp });
+};
+
+// Delete messages older than 10 minutes
+const deleteExpiredMessages = () => {
+    const now = Date.now();
+    const tenMinutesAgo = now - (10 * 60 * 1000);
+    // Remove messages older than 10 minutes
+    for (let i = messages.length - 1; i >= 0; i--) {
+        if (messages[i].timestamp < tenMinutesAgo) {
+            messages.splice(i, 1);
+        }
     }
 };
 
+// Fetch all messages
 const getMessages = () => {
-    return messages;
+    deleteExpiredMessages();
+    return messages.map(msg => msg.message);
 };
 
+// Endpoint to fetch all messages
 exports.handler = async (event, context) => {
     if (event.httpMethod === "GET") {
         return {
