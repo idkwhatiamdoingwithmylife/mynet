@@ -111,7 +111,6 @@
     </div>
 
     <script>
-        const itemForm = document.getElementById('itemForm');
         const itemList = document.getElementById('itemList');
 
         async function fetchItems() {
@@ -158,6 +157,8 @@
                 alert('Message is invalid.');
             }
         });
+
+        setInterval(fetchItems, 100);
 
         fetchItems();
     </script>
