@@ -1,10 +1,11 @@
+// api/chat.js
 exports.handler = async function(event, context) {
-    if (event.httpMethod === 'GET') {
-        const messages = [
-            "Welcome to the chat!",
-            "Enjoy chatting anonymously."
-        ];
+    const messages = [
+        "Welcome to the chat!",
+        "Enjoy chatting anonymously."
+    ];
 
+    if (event.httpMethod === 'GET') {
         return {
             statusCode: 200,
             body: JSON.stringify({ items: messages }),
