@@ -1,44 +1,53 @@
-// api.js (Netlify Function)
-
-let users = [];
-let messages = [];
+const accounts = {};  // This will store user data in memory for simplicity (Netlify serverless function doesn't allow file storage directly)
+let messages = [];  // Store messages in memory as well
 
 exports.handler = async (event, context) => {
-  const { action } = JSON.parse(event.body || '{}');
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify({ success: true, list: messages }), // Ensure the messages are sent as part of the response
-  };
+    const { action, username, password, color, message } = JSON.parse(event.body || '{}');
 
-  // Handle creating a new account (username and password)
-  if (action === 'createAccount') {
-    const { username, password, color } = JSON.parse(event.body);
+    switch(action) {
+        case 'createAccount':
+            if (accounts[username]) {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({ success: false, message: 'Username already taken.' })
+                };
+            }
+            
+            if (username.length < 5 || password.length < 4) {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({ success: false, message: 'Username or password is too short.' })
+                };
+            }
 
-    // Check if the username already exists
-    const existingUser = users.find(user => user.username === username);
-    if (existingUser) {
-      response.statusCode = 400;
-      response.body = JSON.stringify({ success: false, message: 'Username already exists' });
-      return response;
+            // Create account (store it in memory)
+            accounts[username] = { password, color };
+            return {
+                statusCode: 200,
+                body: JSON.stringify({ success: true })
+            };
+
+        case 'sendMessage':
+            if (!username || !message) {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({ success: false, message: 'Username and message are required.' })
+                };
+            }
+
+            // Store message
+            const newMessage = { username, message, color };
+            messages.push(newMessage);
+
+            return {
+                statusCode: 200,
+                body: JSON.stringify({ success: true, list: messages })
+            };
+
+        default:
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ success: false, message: 'Invalid action.' })
+            };
     }
-
-    // Add the new user to the in-memory array
-    users.push({ username, password, color });
-    return response;
-  }
-
-  // Handle sending a message
-  if (action === 'sendMessage') {
-    const { username, message, color } = JSON.parse(event.body);
-
-    // Store the message
-    messages.push({ username, message, color });
-
-    return response;
-  }
-
-  // Default response if no action matches
-  response.statusCode = 400;
-  response.body = JSON.stringify({ success: false, message: 'Invalid action' });
-  return response;
 };
