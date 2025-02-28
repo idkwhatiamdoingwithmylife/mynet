@@ -1,19 +1,16 @@
-exports.handler = async function(event, context) {
-    const { action, username, message, color } = JSON.parse(event.body);
+exports.handler = async (event) => {
+    const messages = global.messages || [];
     
-    let list = JSON.parse(process.env.LIST || '[]');
-    
-    if (action === 'sendMessage') {
-        list.push({ username, message, color });
-        process.env.LIST = JSON.stringify(list);
-        return {
-            statusCode: 200,
-            body: JSON.stringify({ success: true, list })
-        };
+    if (event.httpMethod === "POST") {
+        const data = JSON.parse(event.body || "{}");
+        
+        if (data.action === "sendMessage") {
+            messages.push({ username: data.username, message: data.message, color: data.color });
+
+            global.messages = messages.slice(-100);
+            return { statusCode: 200, body: JSON.stringify({ success: true }) };
+        }
     }
-    
-    return {
-        statusCode: 400,
-        body: JSON.stringify({ success: false, message: 'Invalid action' })
-    };
+
+    return { statusCode: 200, body: JSON.stringify({ list: messages }) };
 };
