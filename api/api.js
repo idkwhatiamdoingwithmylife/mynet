@@ -1,24 +1,28 @@
-let list = [];  // In-memory list to store the data (note: this resets every time the server restarts)
+let list = [];
+let listKey = 'HI_LIST';
 
 exports.handler = async function(event, context) {
+    if (process.env[listKey]) {
+        list = JSON.parse(process.env[listKey]);
+    }
+
     if (event.httpMethod === 'POST') {
-        const body = JSON.parse(event.body);  // Parse the request body
-        
+        const body = JSON.parse(event.body);
+
         if (body.action === 'add') {
-            // Add "hi" to the list
             list.push('hi');
         }
 
         if (body.action === 'remove') {
-            // Remove the last "hi" from the list
             const index = list.lastIndexOf('hi');
             if (index !== -1) {
-                list.splice(index, 1);  // Remove the element from the list
+                list.splice(index, 1);
             }
         }
+
+        process.env[listKey] = JSON.stringify(list);
     }
 
-    // Respond with the current list after any modifications
     return {
         statusCode: 200,
         body: JSON.stringify({ list: list })
