@@ -3,84 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Message Board</title>
+    <title>Chat Anonymously</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-        #list {
+        #chat {
             margin-top: 20px;
             padding: 10px;
             background-color: #f0f0f0;
             border-radius: 5px;
+            max-width: 500px;
         }
-        #messageInput {
-            margin-top: 20px;
-            padding: 10px;
-            width: 100%;
-            max-width: 400px;
+        #messages {
+            list-style: none;
+            padding: 0;
+        }
+        .message {
+            margin-bottom: 5px;
         }
     </style>
 </head>
 <body>
 
-    <h1>Live Message Board</h1>
-    <input type="text" id="messageInput" placeholder="Type your message..." />
-    <button onclick="sendMessage()">Send Message</button>
+    <h1>Chat Anonymously</h1>
 
-    <div id="list">
+    <label for="username">Username:</label>
+    <input type="text" id="username" placeholder="Enter your name..." />
+    
+    <label for="color">Choose Text Color:</label>
+    <input type="color" id="color" value="#000000" />
+
+    <br><br>
+
+    <input type="text" id="messageInput" placeholder="Type your message..." />
+    <button onclick="sendMessage()">Send</button>
+
+    <div id="chat">
         <h2>Messages:</h2>
-        <ul id="listItems"></ul>
+        <ul id="messages"></ul>
     </div>
 
     <script>
         function sendMessage() {
+            const username = document.getElementById('username').value.trim();
+            const color = document.getElementById('color').value;
             const messageInput = document.getElementById('messageInput');
             const message = messageInput.value.trim();
-            if (message) {
+
+            if (username && message) {
                 fetch('/.netlify/functions/api', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ action: 'sendMessage', message: message })
+                    body: JSON.stringify({ action: 'sendMessage', username, message, color })
                 })
                 .then(response => response.json())
                 .then(data => {
-                    updateList(data.list);
-                    messageInput.value = ''; // Clear the input after sending
+                    updateMessages(data.list);
+                    messageInput.value = ''; // Clear input after sending
                 })
                 .catch(error => {
                     console.error('Error:', error);
                 });
+            } else {
+                alert("Enter a username and a message.");
             }
         }
 
-        function updateList(list) {
-            const listItems = document.getElementById('listItems');
-            listItems.innerHTML = '';
-            list.forEach(item => {
+        function updateMessages(messages) {
+            const messagesList = document.getElementById('messages');
+            messagesList.innerHTML = '';
+
+            messages.forEach(item => {
                 const li = document.createElement('li');
-                li.textContent = item;
-                listItems.appendChild(li);
+                li.className = "message";
+                li.innerHTML = `<strong style="color:${item.color}">${item.username}:</strong> ${item.message}`;
+                messagesList.appendChild(li);
             });
         }
 
-        function fetchList() {
+        function fetchMessages() {
             fetch('/.netlify/functions/api')
                 .then(response => response.json())
                 .then(data => {
-                    updateList(data.list);
+                    updateMessages(data.list);
                 })
-                .catch(error => console.error('Error fetching list:', error));
+                .catch(error => console.error('Error fetching messages:', error));
         }
 
         window.onload = function() {
-            fetchList();
-            setInterval(fetchList, 2000);  // Poll every 2 seconds for live updates
+            fetchMessages();
+            setInterval(fetchMessages, 500);
         };
     </script>
-    
+
 </body>
 </html>
