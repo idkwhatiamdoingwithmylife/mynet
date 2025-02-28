@@ -1,5 +1,5 @@
 let messages = [];
-let messagesKey = 'MESSAGES_LIST';
+let messagesKey = 'CHAT_MESSAGES';
 
 exports.handler = async function(event, context) {
     if (process.env[messagesKey]) {
@@ -9,15 +9,19 @@ exports.handler = async function(event, context) {
     if (event.httpMethod === 'POST') {
         const body = JSON.parse(event.body);
 
-        if (body.action === 'sendMessage' && body.message) {
-            messages.push(body.message); // Add the user message to the list
+        if (body.action === 'sendMessage' && body.username && body.message && body.color) {
+            messages.push({
+                username: body.username,
+                message: body.message,
+                color: body.color
+            });
         }
 
-        process.env[messagesKey] = JSON.stringify(messages); // Save messages to environment variable
+        process.env[messagesKey] = JSON.stringify(messages);
     }
 
     return {
         statusCode: 200,
-        body: JSON.stringify({ list: messages }) // Return the current list of messages
+        body: JSON.stringify({ list: messages })
     };
 };
