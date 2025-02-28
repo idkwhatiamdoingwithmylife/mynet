@@ -9,6 +9,11 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
+        .top-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
         #chat {
             margin-top: 20px;
             padding: 10px;
@@ -23,27 +28,26 @@
         .message {
             margin-bottom: 5px;
         }
-        .top-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
     </style>
 </head>
 <body>
 
     <div class="top-buttons">
         <h1>Chat Anonymously</h1>
+        <button onclick="window.location.href='login.html'">Login</button>
         <button onclick="makeAccount()">Make Account</button>
     </div>
 
     <div id="accountSection" style="display: none;">
         <label for="username">Choose Username:</label>
         <input type="text" id="username" placeholder="Enter a username..." />
-        
+
+        <label for="password">Choose Password:</label>
+        <input type="password" id="password" placeholder="Enter a password..." />
+
         <label for="accountColor">Choose Text Color:</label>
         <input type="color" id="accountColor" value="#000000" />
-        
+
         <button onclick="saveAccount()">Save Account</button>
     </div>
 
@@ -58,7 +62,7 @@
     </div>
 
     <script>
-        let user = {};
+        let user = JSON.parse(localStorage.getItem('user')) || {};
 
         function makeAccount() {
             document.getElementById("accountSection").style.display = "block";
@@ -66,10 +70,11 @@
 
         function saveAccount() {
             const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value.trim();
             const color = document.getElementById("accountColor").value;
 
-            if (!username) {
-                alert("Please enter a username.");
+            if (!username || !password) {
+                alert("Please enter a username and password.");
                 return;
             }
 
@@ -78,14 +83,16 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ action: 'createAccount', username, color })
+                body: JSON.stringify({ action: 'createAccount', username, password, color })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     user = { username, color };
+                    localStorage.setItem('user', JSON.stringify(user));
                     document.getElementById("accountSection").style.display = "none";
-                    alert("Account created successfully!");
+                    alert("Account created successfully! Please login.");
+                    window.location.href = "login.html";
                 } else {
                     alert("Username already taken. Try another.");
                 }
@@ -100,7 +107,7 @@
             if (!message) return;
 
             if (!user.username) {
-                alert("Please make an account first.");
+                alert("Please log in first.");
                 return;
             }
 
