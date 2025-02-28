@@ -3,104 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Item List</title>
+    <title>Simple Add to List</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            padding: 20px;
+            margin: 20px;
         }
-        input[type="text"] {
-            padding: 10px;
-            margin: 10px 0;
-            width: 200px;
-        }
-        button {
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        #item-list {
+        #list {
             margin-top: 20px;
-        }
-        .item {
-            margin: 5px 0;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <h1>Enter Items to Add to the List</h1>
-    <input type="text" id="item-input" placeholder="Enter item here">
-    <button onclick="addItem()">Add Item</button>
 
-    <div id="item-list">
-        <h2>Item List:</h2>
-        <!-- List items will appear here -->
+    <h1>Click to Add "hi" to List</h1>
+    <button onclick="addHiToList()">Add "hi"</button>
+
+    <div id="list">
+        <h2>Current List:</h2>
+        <ul id="listItems"></ul>
     </div>
 
     <script>
-        const apiUrl = 'https://anonymous-chat-now.netlify.app/api/api.js'; // Your actual Netlify API URL
-
-        async function addItem() {
-            const itemInput = document.getElementById('item-input');
-            const itemValue = itemInput.value.trim();
-
-            // Check if the input is valid
-            if (itemValue === '') {
-                alert('Please enter an item!');
-                return;
-            }
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ item: itemValue })  // Properly stringify the data
+        function addHiToList() {
+            fetch('/.netlify/functions/addHi', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                const listItems = document.getElementById('listItems');
+                listItems.innerHTML = '';  // Clear the existing list
+                data.list.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    listItems.appendChild(li);
                 });
-
-                if (response.ok) {
-                    itemInput.value = ''; // Clear input after successful add
-                    loadItems(); // Reload item list
-                } else {
-                    const errorData = await response.json();
-                    alert(`Error: ${errorData.message}`);
-                }
-            } catch (error) {
-                alert('Error connecting to the server');
+            })
+            .catch(error => {
                 console.error('Error:', error);
-            }
+            });
         }
 
-        async function loadItems() {
-            try {
-                const response = await fetch(apiUrl);
-
-                if (!response.ok) {
-                    alert('Failed to load items');
-                    return;
-                }
-
-                const items = await response.json();
-                const itemListDiv = document.getElementById('item-list');
-                itemListDiv.innerHTML = '<h2>Item List:</h2>'; // Reset the list first
-                items.forEach(item => {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.classList.add('item');
-                    itemDiv.textContent = item;
-                    itemListDiv.appendChild(itemDiv);
-                });
-            } catch (error) {
-                alert('Error connecting to the server');
-                console.error('Error:', error);
-            }
-        }
-
-        // Load items when the page loads
-        window.onload = loadItems;
+        // Fetch initial list from server
+        window.onload = function() {
+            fetch('/.netlify/functions/addHi')
+                .then(response => response.json())
+                .then(data => {
+                    const listItems = document.getElementById('listItems');
+                    data.list.forEach(item => {
+                        const li = document.createElement('li');
+                        li.textContent = item;
+                        listItems.appendChild(li);
+                    });
+                })
+                .catch(error => console.error('Error fetching list:', error));
+        };
     </script>
+    
 </body>
 </html>
