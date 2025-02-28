@@ -1,6 +1,9 @@
+// chat.js - Handles frontend interaction with the API
+
 const messageInput = document.getElementById('messageInput');
 const messagesContainer = document.getElementById('messages');
 
+// Fetch and display messages from the API
 const loadMessages = async () => {
     try {
         const response = await fetch('/.netlify/functions/api');
@@ -11,6 +14,7 @@ const loadMessages = async () => {
     }
 };
 
+// Send a message to the API
 const sendMessage = async () => {
     const message = messageInput.value.trim();
     if (message) {
@@ -20,8 +24,8 @@ const sendMessage = async () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message })
             });
-            messageInput.value = '';
-            loadMessages();
+            messageInput.value = ''; // Clear the input
+            loadMessages(); // Refresh the message list
         } catch (error) {
             console.error("Error sending message:", error);
         }
