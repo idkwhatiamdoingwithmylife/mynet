@@ -1,5 +1,5 @@
 let list = [];
-let listKey = 'HI_LIST';
+let listKey = 'MESSAGE_LIST';
 
 exports.handler = async function(event, context) {
     if (process.env[listKey]) {
@@ -10,11 +10,11 @@ exports.handler = async function(event, context) {
         const body = JSON.parse(event.body);
 
         if (body.action === 'add') {
-            list.push('hi');
+            list.push(body.message);
         }
 
         if (body.action === 'remove') {
-            const index = list.lastIndexOf('hi');
+            const index = list.lastIndexOf(body.message);
             if (index !== -1) {
                 list.splice(index, 1);
             }
