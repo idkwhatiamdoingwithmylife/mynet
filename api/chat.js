@@ -1,62 +1,37 @@
-const fs = require('fs');
-const path = require('path');
+// chat.js - Handles frontend interaction with the API
 
-const filePath = path.resolve(__dirname, '../messages.json');
+const messageInput = document.getElementById('messageInput');
+const messagesContainer = document.getElementById('messages');
 
-exports.handler = async function(event, context) {
-    if (event.httpMethod === 'GET') {
-        // Read the stored messages
-        try {
-            const data = fs.readFileSync(filePath, 'utf-8');
-            const messages = JSON.parse(data);
-            return {
-                statusCode: 200,
-                body: JSON.stringify({ items: messages }),
-            };
-        } catch (err) {
-            return {
-                statusCode: 500,
-                body: JSON.stringify({ error: 'Failed to read messages.' }),
-            };
-        }
+// Fetch and display messages from the API
+const loadMessages = async () => {
+    try {
+        const response = await fetch('/.netlify/functions/api');
+        const data = await response.json();
+        messagesContainer.innerHTML = data.map(msg => `<div class="message">${msg}</div>`).join('');
+    } catch (error) {
+        console.error("Error fetching messages:", error);
     }
-
-    if (event.httpMethod === 'POST') {
-        // Save a new message
-        try {
-            const { name, message } = JSON.parse(event.body);
-
-            if (!name || !message) {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({ error: 'Name and message are required.' }),
-                };
-            }
-
-            // Read existing messages
-            let data = fs.readFileSync(filePath, 'utf-8');
-            let messages = JSON.parse(data);
-
-            // Add the new message
-            messages.push({ name, message });
-
-            // Write the updated messages to the file
-            fs.writeFileSync(filePath, JSON.stringify(messages, null, 2));
-
-            return {
-                statusCode: 200,
-                body: JSON.stringify({ success: true }),
-            };
-        } catch (err) {
-            return {
-                statusCode: 500,
-                body: JSON.stringify({ error: 'Failed to save message.' }),
-            };
-        }
-    }
-
-    return {
-        statusCode: 405,
-        body: JSON.stringify({ error: 'Method Not Allowed' }),
-    };
 };
+
+// Send a message to the API
+const sendMessage = async () => {
+    const message = messageInput.value.trim();
+    if (message) {
+        try {
+            await fetch('/.netlify/functions/api', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            });
+            messageInput.value = ''; // Clear the input
+            loadMessages(); // Refresh the message list
+        } catch (error) {
+            console.error("Error sending message:", error);
+        }
+    }
+};
+
+// Initialize and load messages every 3 seconds
+loadMessages();
+setInterval(loadMessages, 3000);
