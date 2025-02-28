@@ -9,11 +9,11 @@ exports.handler = async function(event, context) {
     if (event.httpMethod === 'POST') {
         const body = JSON.parse(event.body);
 
-        if (body.action === 'add') {
+        if (body.action === 'add' && body.message) {
             list.push(body.message);
         }
 
-        if (body.action === 'remove') {
+        if (body.action === 'remove' && body.message) {
             const index = list.lastIndexOf(body.message);
             if (index !== -1) {
                 list.splice(index, 1);
