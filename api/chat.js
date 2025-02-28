@@ -1,9 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const filePath = path.resolve(__dirname, 'messages.json');
+const filePath = path.resolve(__dirname, '../../messages.json');
 
-// Handler for GET and POST requests
 exports.handler = async function(event, context) {
     if (event.httpMethod === 'GET') {
         try {
@@ -31,14 +30,11 @@ exports.handler = async function(event, context) {
                 };
             }
 
-            // Read existing messages
             let data = fs.readFileSync(filePath, 'utf-8');
             let messages = JSON.parse(data);
 
-            // Add the new message
             messages.push(item);
 
-            // Write the updated messages to the file
             fs.writeFileSync(filePath, JSON.stringify(messages));
 
             return {
