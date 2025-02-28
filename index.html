@@ -91,29 +91,27 @@
         button:hover {
             background-color: #45a049;
         }
+        @media (max-width: 600px) {
+            .name-input, #itemInput {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
-    <a href="login.html" class="link">Login</a>
+    <a href="login.html" class="link">Login/Signup</a>
     <h1>Anonymous Live Chat</h1>
     <div class="chat-container">
         <ul id="itemList"></ul>
         <div class="input-container">
-            <input type="text" class="name-input" id="nameInput" placeholder="Enter your display name" required maxlength="15">
+            <input type="text" class="name-input" id="nameInput" placeholder="Enter your display name (max 15 chars)" required maxlength="15">
             <input type="text" id="itemInput" placeholder="Enter your message (max 1000 characters)" required maxlength="1000">
             <button type="submit">Send</button>
         </div>
     </div>
 
     <script>
-        const name = localStorage.getItem('username');
-        if (!name) {
-            window.location.href = 'login.html';
-        }
-
         const itemList = document.getElementById('itemList');
-        const itemInput = document.getElementById('itemInput');
-        const nameInput = document.getElementById('nameInput');
 
         async function fetchItems() {
             const response = await fetch('/.netlify/functions/chat');
@@ -128,13 +126,20 @@
                 li.textContent = item;
                 itemList.appendChild(li);
             });
-            itemList.scrollTop = itemList.scrollHeight; 
+            itemList.scrollTop = itemList.scrollHeight;
         }
 
         document.querySelector('.input-container button').addEventListener('click', async function(event) {
             event.preventDefault();
+            const nameInput = document.getElementById('nameInput');
+            const itemInput = document.getElementById('itemInput');
+            const name = nameInput.value.trim();
             const item = itemInput.value.trim();
-            if (!item) return;
+
+            if (!name || !item) {
+                alert('Username and message cannot be blank or just spaces.');
+                return;
+            }
 
             const message = `${name}: ${item}`;
 
