@@ -1,62 +1,59 @@
-let messages = [];
+// Handles chat functionality, API interactions, and updates for the message list
 
-exports.handler = async function(event, context) {
-    // Set the CORS headers to allow cross-origin requests
-    const headers = {
-        'Access-Control-Allow-Origin': '*',  // Allow all domains, you can restrict this for security
-        'Access-Control-Allow-Methods': 'GET, POST',
-        'Access-Control-Allow-Headers': 'Content-Type',
-    };
+async function fetchItems() {
+    try {
+        const response = await fetch('/.netlify/functions/chat');
+        const data = await response.json();
+        displayItems(data.items);
+    } catch (err) {
+        console.error("Error fetching items:", err);
+    }
+}
 
-    if (event.httpMethod === 'OPTIONS') {
-        // If the browser sends an OPTIONS request (preflight), just return CORS headers
-        return {
-            statusCode: 204,
-            headers: headers,
-        };
+function displayItems(items) {
+    const itemList = document.getElementById('itemList');
+    itemList.innerHTML = '';  // Clear existing items
+    items.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        itemList.appendChild(li);
+    });
+    itemList.scrollTop = itemList.scrollHeight;  // Scroll to the bottom
+}
+
+document.querySelector('.input-container button').addEventListener('click', async function(event) {
+    event.preventDefault();
+    
+    const nameInput = document.getElementById('nameInput');
+    const itemInput = document.getElementById('itemInput');
+    const name = nameInput.value.trim();
+    const item = itemInput.value.trim();
+
+    if (!name || !item) {
+        alert('Username and message cannot be blank or just spaces.');
+        return;
     }
 
-    if (event.httpMethod === 'GET') {
-        // Return the stored messages
-        return {
-            statusCode: 200,
-            headers: headers,
-            body: JSON.stringify({ items: messages }),
-        };
-    }
+    const message = `${name}: ${item}`;
 
-    if (event.httpMethod === 'POST') {
-        // Save a new message
-        try {
-            const { item } = JSON.parse(event.body);
-            if (!item) {
-                return {
-                    statusCode: 400,
-                    headers: headers,
-                    body: JSON.stringify({ error: 'Message is required.' }),
-                };
-            }
+    try {
+        const response = await fetch('/.netlify/functions/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ item: message })
+        });
 
-            // Add the new message to in-memory store
-            messages.push(item);
-
-            return {
-                statusCode: 200,
-                headers: headers,
-                body: JSON.stringify({ success: true }),
-            };
-        } catch (err) {
-            return {
-                statusCode: 500,
-                headers: headers,
-                body: JSON.stringify({ error: 'Failed to save message.' }),
-            };
+        const data = await response.json();
+        if (data.success) {
+            itemInput.value = '';
+            fetchItems(); // Refresh the message list
+        } else {
+            alert('Message is invalid.');
         }
+    } catch (err) {
+        console.error("Error sending message:", err);
     }
+});
 
-    return {
-        statusCode: 405,
-        headers: headers,
-        body: JSON.stringify({ error: 'Method Not Allowed' }),
-    };
-};
+// Fetch existing messages on page load
+fetchItems();
