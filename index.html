@@ -102,7 +102,7 @@
     </div>
 
     <script>
-        let user = JSON.parse(localStorage.getItem('user')) || { username: 'guest' + Math.floor(Math.random() * 10000) };
+        let user = JSON.parse(localStorage.getItem('user')) || {};
 
         function makeAccount() {
             document.getElementById("accountSection").style.display = "block";
@@ -151,6 +151,11 @@
 
             if (!message) return;
 
+            if (!user.username) {
+                alert("Please log in first.");
+                return;
+            }
+
             fetch('/.netlify/functions/api', {
                 method: 'POST',
                 headers: {
@@ -189,7 +194,7 @@
 
         window.onload = function() {
             fetchMessages();
-            setInterval(fetchMessages, 2000); // Update messages every 2 seconds
+            setInterval(fetchMessages, 2000);
         };
     </script>
 
