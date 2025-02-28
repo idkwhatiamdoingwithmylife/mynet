@@ -6,89 +6,48 @@
     <title>Chat Anonymously</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
+            margin: 20px;
             background-color: #f4f4f9;
             text-align: center;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
         }
-
-        header {
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px 0;
-            font-size: 20px;
-            text-align: center;
+        .top-buttons {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 20px;
+        }
+        .top-buttons button {
             padding: 10px 20px;
-        }
-
-        header .user-info {
             font-size: 16px;
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        header button {
-            background-color: #ffffff;
-            color: #4CAF50;
+            background-color: #4CAF50;
+            color: white;
             border: none;
-            padding: 5px 10px;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
-
-        header button:hover {
-            background-color: #ddd;
+        .top-buttons button:hover {
+            background-color: #45a049;
         }
-
-        .content {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            flex-direction: column;
-            padding: 20px;
-        }
-
         #chat {
-            background-color: #ffffff;
+            margin-top: 20px;
             padding: 20px;
+            background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             max-width: 600px;
-            width: 100%;
-            margin-bottom: 30px;
+            margin-left: auto;
+            margin-right: auto;
         }
-
         #messages {
             list-style: none;
             padding: 0;
-            max-height: 300px;
-            overflow-y: auto;
         }
-
         .message {
             margin-bottom: 10px;
         }
-
-        .message strong {
-            margin-right: 10px;
-            font-weight: bold;
-        }
-
-        .message input[type="color"] {
-            margin-left: 10px;
-        }
-
-        input[type="text"], input[type="color"] {
+        input[type="text"], input[type="password"], input[type="color"] {
             padding: 10px;
             margin-bottom: 10px;
             width: 80%;
@@ -97,140 +56,160 @@
             border: 1px solid #ccc;
             font-size: 16px;
         }
-
-        .message-controls {
-            display: flex;
-            gap: 10px;
+        #accountSection {
             margin-top: 20px;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
         }
-
-        .message-controls button {
-            padding: 10px;
-            font-size: 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+        h1 {
+            font-size: 28px;
+            color: #333;
         }
-
-        .message-controls button:hover {
-            background-color: #45a049;
+        .user-welcome {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 10px;
         }
-
-        .footer {
-            margin-top: auto;
-            background-color: #333;
-            color: white;
-            padding: 15px;
-            text-align: center;
-        }
-
     </style>
 </head>
 <body>
 
-<header>
-    <h1>Chat Anonymously</h1>
-    <div class="user-info">
-        <span id="userGreeting">Hello, Guest</span>
-        <button id="logoutButton" style="display: none;" onclick="logout()">Logout</button>
+    <div class="top-buttons">
+        <div>
+            <button onclick="window.location.href='login.html'">Login</button>
+            <button onclick="makeAccount()">Make Account</button>
+        </div>
+        <div class="user-welcome" id="welcomeMessage"></div>
     </div>
-</header>
 
-<div class="content">
+    <div id="accountSection" style="display: none;">
+        <label for="username">Choose Username (Min 5 characters):</label>
+        <input type="text" id="username" placeholder="Enter a username..." />
+
+        <label for="password">Choose Password (Min 4 characters):</label>
+        <input type="password" id="password" placeholder="Enter a password..." />
+
+        <label for="accountColor">Choose Text Color:</label>
+        <input type="color" id="accountColor" value="#000000" />
+
+        <button onclick="saveAccount()">Save Account</button>
+    </div>
+
+    <br>
+
+    <input type="text" id="messageInput" placeholder="Type your message..." />
+    <button onclick="sendMessage()">Send</button>
+
     <div id="chat">
         <h2>Messages:</h2>
         <ul id="messages"></ul>
     </div>
 
-    <div class="message-controls">
-        <input type="text" id="messageInput" placeholder="Type your message..." />
-        <button onclick="sendMessage()">Send</button>
-    </div>
-</div>
+    <script>
+        let user = JSON.parse(localStorage.getItem('user')) || {};
 
-<div class="footer">
-    <p>Anonymous Chat © 2025</p>
-</div>
-
-<script>
-    let user = JSON.parse(localStorage.getItem('user')) || {};
-
-    function updateUserGreeting() {
-        const userGreeting = document.getElementById('userGreeting');
-        if (user.username) {
-            userGreeting.textContent = `Hello, ${user.username}`;
-            document.getElementById('logoutButton').style.display = 'inline-block';
-        } else {
-            userGreeting.textContent = 'Hello, Guest';
-            document.getElementById('logoutButton').style.display = 'none';
-        }
-    }
-
-    function logout() {
-        localStorage.removeItem('user');
-        user = {};
-        updateUserGreeting();
-    }
-
-    function sendMessage() {
-        const messageInput = document.getElementById('messageInput');
-        const message = messageInput.value.trim();
-
-        if (!message) return;
-
-        if (!user.username) {
-            alert("Please create an account or log in.");
-            return;
+        function makeAccount() {
+            document.getElementById("accountSection").style.display = "block";
         }
 
-        fetch('/.netlify/functions/api', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ action: 'sendMessage', username: user.username, message, color: user.color })
-        })
-        .then(response => response.json())
-        .then(data => {
-            updateMessages(data.list);
-            messageInput.value = ''; 
-        })
-        .catch(error => console.error('Error:', error));
-    }
+        function saveAccount() {
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const color = document.getElementById("accountColor").value;
 
-    function updateMessages(messages) {
-        const messagesList = document.getElementById('messages');
-        messagesList.innerHTML = '';
+            if (username.length < 5) {
+                alert("Username must be at least 5 characters.");
+                return;
+            }
 
-        messages.forEach(item => {
-            const li = document.createElement('li');
-            li.className = "message";
-            li.innerHTML = `<strong style="color:${item.color}">${item.username}:</strong> ${item.message}`;
-            messagesList.appendChild(li);
-        });
-    }
+            if (password.length < 4) {
+                alert("Password must be at least 4 characters.");
+                return;
+            }
 
-    function fetchMessages() {
-        fetch('/.netlify/functions/api')
+            fetch('/.netlify/functions/api', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: 'createAccount', username, password, color })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    user = { username, color };
+                    localStorage.setItem('user', JSON.stringify(user));
+                    document.getElementById("accountSection").style.display = "none";
+                    alert("Account created successfully! Please login.");
+                    window.location.href = "login.html";
+                } else {
+                    alert("Username already taken. Try another.");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+
+            if (!message) return;
+
+            if (!user.username) {
+                alert("Please log in first.");
+                return;
+            }
+
+            fetch('/.netlify/functions/api', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: 'sendMessage', username: user.username, message, color: user.color })
+            })
             .then(response => response.json())
             .then(data => {
                 updateMessages(data.list);
+                messageInput.value = ''; 
             })
-            .catch(error => console.error('Error fetching messages:', error));
-    }
+            .catch(error => console.error('Error:', error));
+        }
 
-    function loadUserData() {
-        if (user.username && user.color) {
-            updateUserGreeting();
+        function updateMessages(messages) {
+            const messagesList = document.getElementById('messages');
+            messagesList.innerHTML = '';
+
+            messages.forEach(item => {
+                const li = document.createElement('li');
+                li.className = "message";
+                li.innerHTML = `<strong style="color:${item.color}">${item.username}:</strong> ${item.message}`;
+                messagesList.appendChild(li);
+            });
+        }
+
+        function fetchMessages() {
+            fetch('/.netlify/functions/api')
+                .then(response => response.json())
+                .then(data => {
+                    updateMessages(data.list);
+                })
+                .catch(error => console.error('Error fetching messages:', error));
+        }
+
+        window.onload = function() {
             fetchMessages();
             setInterval(fetchMessages, 2000);
-        }
-    }
 
-    window.onload = loadUserData;
-</script>
+            if (user.username) {
+                document.getElementById("welcomeMessage").textContent = `Welcome, ${user.username}!`;
+            } else {
+                document.getElementById("welcomeMessage").textContent = "Welcome, Guest!";
+            }
+        };
+    </script>
 
 </body>
 </html>
