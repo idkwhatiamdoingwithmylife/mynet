@@ -29,9 +29,6 @@
 
     <h1>Chat Anonymously</h1>
 
-    <label for="username">Username:</label>
-    <input type="text" id="username" placeholder="Enter your name..." />
-    
     <label for="color">Choose Text Color:</label>
     <input type="color" id="color" value="#000000" />
 
@@ -47,18 +44,17 @@
 
     <script>
         function sendMessage() {
-            const username = document.getElementById('username').value.trim();
             const color = document.getElementById('color').value;
             const messageInput = document.getElementById('messageInput');
             const message = messageInput.value.trim();
 
-            if (username && message) {
+            if (message) {
                 fetch('/.netlify/functions/api', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ action: 'sendMessage', username, message, color })
+                    body: JSON.stringify({ action: 'sendMessage', message, color })
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -68,8 +64,6 @@
                 .catch(error => {
                     console.error('Error:', error);
                 });
-            } else {
-                alert("Enter a username and a message.");
             }
         }
 
@@ -80,7 +74,7 @@
             messages.forEach(item => {
                 const li = document.createElement('li');
                 li.className = "message";
-                li.innerHTML = `<strong style="color:${item.color}">${item.username}:</strong> ${item.message}`;
+                li.innerHTML = `<span style="color:${item.color}">${item.message}</span>`;
                 messagesList.appendChild(li);
             });
         }
@@ -96,7 +90,7 @@
 
         window.onload = function() {
             fetchMessages();
-            setInterval(fetchMessages, 500);
+            setInterval(fetchMessages, 2000);  // Poll every 2 seconds for live updates
         };
     </script>
 
