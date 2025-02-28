@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Add to List</title>
+    <title>Simple Add/Remove from List</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,8 +19,9 @@
 </head>
 <body>
 
-    <h1>Click to Add "hi" to List</h1>
+    <h1>Manage "hi" in List</h1>
     <button onclick="addHiToList()">Add "hi"</button>
+    <button onclick="removeHiFromList()">Remove "hi"</button>
 
     <div id="list">
         <h2>Current List:</h2>
@@ -38,30 +39,45 @@
             })
             .then(response => response.json())
             .then(data => {
-                const listItems = document.getElementById('listItems');
-                listItems.innerHTML = '';  // Clear the existing list
-                data.list.forEach(item => {
-                    const li = document.createElement('li');
-                    li.textContent = item;
-                    listItems.appendChild(li);
-                });
+                updateList(data.list);
             })
             .catch(error => {
                 console.error('Error:', error);
             });
         }
 
-        // Fetch initial list from server
+        function removeHiFromList() {
+            fetch('/.netlify/functions/api', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: 'remove' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                updateList(data.list);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function updateList(list) {
+            const listItems = document.getElementById('listItems');
+            listItems.innerHTML = '';  // Clear the existing list
+            list.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                listItems.appendChild(li);
+            });
+        }
+
         window.onload = function() {
             fetch('/.netlify/functions/api')
                 .then(response => response.json())
                 .then(data => {
-                    const listItems = document.getElementById('listItems');
-                    data.list.forEach(item => {
-                        const li = document.createElement('li');
-                        li.textContent = item;
-                        listItems.appendChild(li);
-                    });
+                    updateList(data.list);
                 })
                 .catch(error => console.error('Error fetching list:', error));
         };
